@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type StaffRole = 'waiter' | 'receptionist';
+export type StaffRole = 'waiter' | 'receptionist' | 'manager';
 export type StaffStatus = 'active' | 'inactive';
 
 export interface StaffMember {

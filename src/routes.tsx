@@ -18,6 +18,13 @@ import ProtectedRoute from './components/ProtectedRoute';
 import StaffManagerLoginPage from './pages/auth/StaffManagerLogin';
 import RestaurantLoginPage from './pages/auth/RestaurantLoginPage';
 
+// Manager nested pages
+import ManagerOverviewPage from './pages/dashboard/manager/OverviewPage';
+import ManagerBranchInfoPage from './pages/dashboard/manager/BranchInfoPage';
+import ManagerTablesPage from './pages/dashboard/manager/TablesPage';
+import ManagerStaffPage from './pages/dashboard/manager/StaffPage';
+import ManagerPromotionsPage from './pages/dashboard/manager/PromotionsPage';
+
 // Owner nested pages
 import OwnerOverviewPage from './pages/dashboard/owner/OverviewPage';
 import OwnerMenuPage from './pages/dashboard/owner/MenuPage';
@@ -131,10 +138,36 @@ export const routes: RouteObject[] = [
   {
     path: '/dashboard/manager',
     element: (
-      <ProtectedRoute>
+      <ProtectedRoute allowedRoles={['branch_manager']}>
         <ManagerDashboard />
       </ProtectedRoute>
     ),
+    children: [
+      {
+        index: true,
+        element: <ManagerOverviewPage />,
+      },
+      {
+        path: 'overview',
+        element: <ManagerOverviewPage />,
+      },
+      {
+        path: 'branch',
+        element: <ManagerBranchInfoPage />,
+      },
+      {
+        path: 'tables',
+        element: <ManagerTablesPage />,
+      },
+      {
+        path: 'staff',
+        element: <ManagerStaffPage />,
+      },
+      {
+        path: 'promotions',
+        element: <ManagerPromotionsPage />,
+      },
+    ],
   },
   {
     path: '/dashboard/admin',

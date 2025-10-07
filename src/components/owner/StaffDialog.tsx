@@ -20,10 +20,11 @@ const staffSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Valid email required'),
   phone: z.string().optional(),
-  role: z.enum(['waiter', 'receptionist']),
+  role: z.enum(['waiter', 'receptionist', 'manager']),
   status: z.enum(['active', 'inactive']),
   username: z.string().min(3, 'Username must be at least 3 characters'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
+  branchId: z.string().optional(),
 });
 
 type StaffFormData = z.infer<typeof staffSchema>;
@@ -82,26 +83,33 @@ export const StaffDialog = ({ open, onOpenChange, branchId, staff }: StaffDialog
   }, [staff, reset]);
 
   const onSubmit = (data: StaffFormData) => {
+    // For managers without a branch, set empty branchId, otherwise use the provided branchId
+    const finalBranchId = data.role === 'manager' && !data.branchId ? '' : branchId;
+
+    const staffData = {
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      role: data.role,
+      status: data.status,
+      username: data.username,
+      password: data.password,
+      branchId: finalBranchId,
+    };
+
     if (staff) {
-      updateStaff(staff.id, data);
+      updateStaff(staff.id, staffData);
       toast({
         title: 'Staff Updated',
         description: 'The staff member has been updated successfully.',
       });
     } else {
-      addStaff({
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        role: data.role,
-        status: data.status,
-        username: data.username,
-        password: data.password,
-        branchId,
-      });
+      addStaff(staffData);
       toast({
         title: 'Staff Added',
-        description: 'The staff member has been added successfully.',
+        description: data.role === 'manager' 
+          ? 'Manager created. Assign them to a branch from the staff list.'
+          : 'The staff member has been added successfully.',
       });
     }
     onOpenChange(false);
@@ -142,18 +150,24 @@ export const StaffDialog = ({ open, onOpenChange, branchId, staff }: StaffDialog
               <Input {...register('phone')} id="phone" placeholder="+1 234 567 8900" />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="role">Role *</Label>
-              <Select value={role} onValueChange={(value) => setValue('role', value as StaffRole)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="waiter">Waiter</SelectItem>
-                  <SelectItem value="receptionist">Receptionist</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="role">Role *</Label>
+            <Select value={role} onValueChange={(value) => setValue('role', value as StaffRole)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="waiter">Waiter</SelectItem>
+                <SelectItem value="receptionist">Receptionist</SelectItem>
+                <SelectItem value="manager">Manager</SelectItem>
+              </SelectContent>
+            </Select>
+            {role === 'manager' && (
+              <p className="text-xs text-muted-foreground">
+                Managers can be assigned to branches later from the staff list
+              </p>
+            )}
+          </div>
           </div>
 
           <div className="space-y-2">

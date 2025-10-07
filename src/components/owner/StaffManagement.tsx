@@ -81,7 +81,7 @@ const staff = allStaff.filter(s => s.branchId === branchId);
                             {member.status}
                           </Badge>
                           <Badge variant="outline">
-                            {member.role === 'receptionist' ? 'Receptionist' : 'Waiter'}
+                            {member.role === 'receptionist' ? 'Receptionist' : member.role === 'manager' ? 'Manager' : 'Waiter'}
                           </Badge>
                         </div>
                         <div className="space-y-1 text-sm text-muted-foreground">
