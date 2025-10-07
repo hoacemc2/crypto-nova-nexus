@@ -3,6 +3,8 @@ import { useAuthStore } from '@/store/authStore';
 import { OverviewDashboard } from '@/components/owner/OverviewDashboard';
 import { useEffect, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { RefreshCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const OwnerOverviewPage = () => {
   const { user } = useAuthStore();
@@ -28,7 +30,7 @@ const OwnerOverviewPage = () => {
     }
 
     const allBranches = JSON.parse(localStorage.getItem('mock_branches') || '[]');
-    const brandBranches = allBranches.filter((b: any) => 
+    const brandBranches = allBranches.filter((b: any) =>
       b.brandName === selectedBrand && b.ownerId === user.id
     );
 
@@ -48,7 +50,7 @@ const OwnerOverviewPage = () => {
     // Reload branches after update
     const selectedBrand = localStorage.getItem('selected_brand');
     const allBranches = JSON.parse(localStorage.getItem('mock_branches') || '[]');
-    const brandBranches = allBranches.filter((b: any) => 
+    const brandBranches = allBranches.filter((b: any) =>
       b.brandName === selectedBrand && b.ownerId === user?.id
     );
     setUserBranches(brandBranches);
@@ -67,15 +69,13 @@ const OwnerOverviewPage = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <button
-          className="px-4 py-2 rounded bg-primary text-white hover:bg-primary/90 transition"
-          onClick={handleChooseBrand}
-        >
+        <Button onClick={handleChooseBrand}>
+          <RefreshCcw className="h-4 w-4 mr-2" />
           Choose Another Brand
-        </button>
+        </Button>
       </div>
-      <OverviewDashboard 
-        userBranches={userBranches} 
+      <OverviewDashboard
+        userBranches={userBranches}
         onBranchUpdate={handleBranchUpdate}
       />
     </div>

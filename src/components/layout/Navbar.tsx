@@ -67,20 +67,27 @@ export const Navbar = () => {
             </>
           ) : (
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted transition-colors">
+              <DropdownMenuTrigger asChild> 
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2 h-auto border-muted-foreground/20 hover:bg-muted transition-all"
+                >
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback className="bg-primary text-primary-foreground">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
                       {user.name?.charAt(0).toUpperCase() || 'U'}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="hidden md:flex flex-col items-start">
-                    <span className="text-sm font-medium">{user.name}</span>
-                    <Badge variant={getRoleBadgeVariant(user.role)} className="text-xs">
+
+                  <div className="hidden md:flex flex-col items-start leading-tight">
+                    <span className="text-sm font-semibold">{user.name}</span>
+                    <Badge
+                      variant={getRoleBadgeVariant(user.role)}
+                      className="text-[10px] font-normal mt-0.5 px-1.5 py-0"
+                    >
                       {getRoleLabel(user.role)}
                     </Badge>
                   </div>
-                </button>
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <div className="px-2 py-2">

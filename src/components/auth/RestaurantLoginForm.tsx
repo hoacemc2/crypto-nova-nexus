@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, User, Lock } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 
@@ -59,13 +60,18 @@ export const RestaurantLoginForm = ({ restaurant, onBack }: RestaurantLoginFormP
         <p className="text-sm font-medium">{restaurant.name}</p>
         <p className="text-xs text-muted-foreground">{restaurant.branches?.length || 1} {restaurant.branches?.length === 1 ? 'Branch' : 'Branches'}</p>
         {restaurant.branches && (
-          <div className="space-y-1">
-            <label className="text-xs font-medium">Select Branch</label>
-            <select value={selectedBranchId} onChange={(e) => setSelectedBranchId(e.target.value)} className="w-full border rounded px-2 py-1">
-              {restaurant.branches.map((b: any) => (
-                <option key={b.id} value={b.id}>{b.name} — {b.address}</option>
-              ))}
-            </select>
+          <div className="space-y-2">
+            <Label htmlFor="branch-select" className="text-sm font-medium">Select Branch</Label>
+            <Select value={selectedBranchId} onValueChange={setSelectedBranchId}>
+              <SelectTrigger id="branch-select" className="w-full">
+                <SelectValue placeholder="Select a branch" />
+              </SelectTrigger>
+              <SelectContent>
+                {restaurant.branches.map((b: any) => (
+                  <SelectItem key={b.id} value={b.id}>{b.name} — {b.address}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         )}
       </div>
