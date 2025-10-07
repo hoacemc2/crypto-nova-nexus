@@ -18,8 +18,6 @@ export const RestaurantList = ({ onSelectRestaurant }: RestaurantListProps) => {
   const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
-
   useEffect(() => {
     loadBrands();
   }, []);
@@ -66,52 +64,12 @@ export const RestaurantList = ({ onSelectRestaurant }: RestaurantListProps) => {
   };
 
   const handleBrandSelect = (brand: Brand) => {
-    if (brand.branches.length === 1) {
-      onSelectRestaurant(brand.branches[0]);
-    } else {
-      setSelectedBrand(brand);
-    }
-  };
-
-  const handleBranchSelect = (branch: any) => {
-    onSelectRestaurant(branch);
+    // Always select the first branch
+    onSelectRestaurant(brand.branches[0]);
   };
 
   if (isLoading) {
     return <div className="text-center py-8">Loading brands...</div>;
-  }
-
-  if (selectedBrand) {
-    return (
-      <div className="space-y-4">
-        <Button variant="ghost" onClick={() => setSelectedBrand(null)}>
-          ← Back to Brands
-        </Button>
-        
-        <div className="space-y-3 max-h-96 overflow-y-auto">
-          {selectedBrand.branches.map((branch) => (
-            <button
-              key={branch.id}
-              onClick={() => handleBranchSelect(branch)}
-              className="w-full p-4 text-left border rounded-lg hover:border-primary hover:bg-muted/50 transition-all"
-            >
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-primary" />
-                    <h3 className="font-semibold">{branch.name}</h3>
-                  </div>
-                  {branch.address && (
-                    <p className="text-sm text-muted-foreground">{branch.address}</p>
-                  )}
-                </div>
-                <Button variant="ghost" size="sm">Select</Button>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-    );
   }
 
   return (
