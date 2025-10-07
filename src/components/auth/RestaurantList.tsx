@@ -64,8 +64,8 @@ export const RestaurantList = ({ onSelectRestaurant }: RestaurantListProps) => {
   };
 
   const handleBrandSelect = (brand: Brand) => {
-    // Always select the first branch
-    onSelectRestaurant(brand.branches[0]);
+    // Pass the brand object so the login form can show brand name and branch list
+    onSelectRestaurant(brand);
   };
 
   if (isLoading) {

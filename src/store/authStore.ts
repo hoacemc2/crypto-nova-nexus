@@ -89,31 +89,31 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   loginStaff: async (restaurantId: string, username: string, password: string) => {
     set({ isLoading: true });
-    // Find staff user by username (extract from email) and password and matching branchId
+    // Find staff user by username (extracted from email) and password
     // Username patterns: waiter.jane@restaurant.com → "jane", manager@restaurant.com → "manager"
     const found = mockUsers.find(u => {
       const emailUsername = u.email.split('@')[0]; // Get part before @
-      const extractedUsername = emailUsername.includes('.') 
+      const extractedUsername = emailUsername.includes('.')
         ? emailUsername.split('.')[1] // "waiter.jane" → "jane"
         : emailUsername; // "manager" → "manager"
-      
+
       return (
         extractedUsername.toLowerCase() === username.toLowerCase() &&
         u.password === password &&
-        (u.role === 'waiter' || u.role === 'receptionist' || u.role === 'branch_manager') &&
-        u.branchId === restaurantId
+        (u.role === 'waiter' || u.role === 'receptionist' || u.role === 'branch_manager')
       );
     });
     
     if (found) {
       const { password: _pwd, ...userRaw } = found;
+      // Attach selected restaurant/branch id to user object (mock session)
       const user: User = {
         id: userRaw.id,
         email: userRaw.email,
         name: userRaw.name,
         role: userRaw.role as UserRole,
         avatar: userRaw.avatar,
-        branchId: userRaw.branchId,
+        branchId: restaurantId,
       };
       sessionUser = user;
       saveUser(user);

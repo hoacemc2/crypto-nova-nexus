@@ -14,6 +14,7 @@ interface RestaurantLoginFormProps {
 export const RestaurantLoginForm = ({ restaurant, onBack }: RestaurantLoginFormProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedBranchId, setSelectedBranchId] = useState<string>(restaurant?.branches?.[0]?.id || restaurant?.id);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const loginStaff = useAuthStore((state) => state.loginStaff);
@@ -23,7 +24,8 @@ export const RestaurantLoginForm = ({ restaurant, onBack }: RestaurantLoginFormP
     setIsLoading(true);
 
     try {
-      await loginStaff(restaurant.id, username, password);
+      // Use the chosen branch id for login
+      await loginStaff(selectedBranchId || restaurant.id, username, password);
       
       // Get the logged in user to determine redirect
       const user = useAuthStore.getState().user;
@@ -53,9 +55,19 @@ export const RestaurantLoginForm = ({ restaurant, onBack }: RestaurantLoginFormP
         </Button>
       </div>
 
-      <div className="p-4 rounded-lg bg-muted/50 border">
+      <div className="p-4 rounded-lg bg-muted/50 border space-y-2">
         <p className="text-sm font-medium">{restaurant.name}</p>
-        <p className="text-xs text-muted-foreground">{restaurant.address}</p>
+        <p className="text-xs text-muted-foreground">{restaurant.branches?.length || 1} {restaurant.branches?.length === 1 ? 'Branch' : 'Branches'}</p>
+        {restaurant.branches && (
+          <div className="space-y-1">
+            <label className="text-xs font-medium">Select Branch</label>
+            <select value={selectedBranchId} onChange={(e) => setSelectedBranchId(e.target.value)} className="w-full border rounded px-2 py-1">
+              {restaurant.branches.map((b: any) => (
+                <option key={b.id} value={b.id}>{b.name} — {b.address}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
