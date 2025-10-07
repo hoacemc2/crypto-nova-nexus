@@ -333,6 +333,18 @@ export const staffApi = {
   },
 };
 
+// ============= Restaurant API (for staff login) =============
+export const restaurantApi = {
+  getAll: async () => {
+    if (USE_MOCK_DATA) {
+      await mockDelay();
+      const branches = JSON.parse(localStorage.getItem('mock_branches') || JSON.stringify(mockBranches));
+      return { data: branches };
+    }
+    return apiClient.get('/restaurants');
+  },
+};
+
 // ============= Stats API =============
 export const statsApi = {
   getOwnerStats: async () => {

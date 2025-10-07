@@ -89,16 +89,24 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   loginStaff: async (restaurantId: string, username: string, password: string) => {
     set({ isLoading: true });
-    // Find staff user by username and password and matching branchId
-    const found = mockUsers.find(u => 
-      u.email.includes(username.toLowerCase()) && 
-      u.password === password &&
-      (u.role === 'waiter' || u.role === 'receptionist' || u.role === 'branch_manager') &&
-      u.branchId === restaurantId
-    );
+    // Find staff user by username (extract from email) and password and matching branchId
+    // Username patterns: waiter.jane@restaurant.com → "jane", manager@restaurant.com → "manager"
+    const found = mockUsers.find(u => {
+      const emailUsername = u.email.split('@')[0]; // Get part before @
+      const extractedUsername = emailUsername.includes('.') 
+        ? emailUsername.split('.')[1] // "waiter.jane" → "jane"
+        : emailUsername; // "manager" → "manager"
+      
+      return (
+        extractedUsername.toLowerCase() === username.toLowerCase() &&
+        u.password === password &&
+        (u.role === 'waiter' || u.role === 'receptionist' || u.role === 'branch_manager') &&
+        u.branchId === restaurantId
+      );
+    });
     
     if (found) {
-      const { password, ...userRaw } = found;
+      const { password: _pwd, ...userRaw } = found;
       const user: User = {
         id: userRaw.id,
         email: userRaw.email,
@@ -117,7 +125,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user, isAuthenticated: true, isLoading: false });
       toast({ 
         title: 'Welcome back!', 
-        description: `Logged in to branch #${restaurantId}` 
+        description: `Logged in successfully` 
       });
     } else {
       set({ isLoading: false });

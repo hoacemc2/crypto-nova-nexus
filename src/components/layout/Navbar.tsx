@@ -3,10 +3,12 @@ import { Button } from '@/components/ui/button';
 import { UtensilsCrossed } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useEffect } from 'react';
@@ -20,6 +22,27 @@ export const Navbar = () => {
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const getRoleBadgeVariant = (role?: string) => {
+    switch (role) {
+      case 'owner': return 'default';
+      case 'branch_manager': return 'secondary';
+      case 'waiter': return 'outline';
+      case 'receptionist': return 'outline';
+      default: return 'outline';
+    }
+  };
+
+  const getRoleLabel = (role?: string) => {
+    switch (role) {
+      case 'branch_manager': return 'Manager';
+      case 'owner': return 'Owner';
+      case 'waiter': return 'Waiter';
+      case 'receptionist': return 'Receptionist';
+      case 'admin': return 'Admin';
+      default: return role;
+    }
   };
 
   return (
@@ -45,20 +68,39 @@ export const Navbar = () => {
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 p-1 rounded-md hover:bg-muted bg-primary text-primary-foreground">
+                <button className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted transition-colors">
                   <Avatar className="h-8 w-8">
-                    <AvatarFallback>{user.name?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                      {user.name?.charAt(0).toUpperCase() || 'U'}
+                    </AvatarFallback>
                   </Avatar>
-                  <span className="hidden md:block font-medium">{user.name}</span>
+                  <div className="hidden md:flex flex-col items-start">
+                    <span className="text-sm font-medium">{user.name}</span>
+                    <Badge variant={getRoleBadgeVariant(user.role)} className="text-xs">
+                      {getRoleLabel(user.role)}
+                    </Badge>
+                  </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom">
-                <div className="px-4 py-2">
+              <DropdownMenuContent align="end" className="w-56">
+                <div className="px-2 py-2">
                   <div className="font-medium">{user.name}</div>
-                  <div className="text-xs text-muted-foreground">{user.email}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{user.email}</div>
+                  <Badge variant={getRoleBadgeVariant(user.role)} className="text-xs mt-2">
+                    {getRoleLabel(user.role)}
+                  </Badge>
                 </div>
-                <DropdownMenuItem onSelect={() => navigate('/profile')}>Profile</DropdownMenuItem>
-                <DropdownMenuItem onSelect={handleLogout}>Logout</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => navigate('/profile')}>
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => navigate('/settings')}>
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={handleLogout}>
+                  Logout
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}

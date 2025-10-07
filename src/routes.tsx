@@ -16,6 +16,7 @@ import GuestLanding from './pages/GuestLanding';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import StaffManagerLoginPage from './pages/auth/StaffManagerLogin';
+import RestaurantLoginPage from './pages/auth/RestaurantLoginPage';
 
 // Owner nested pages
 import OwnerOverviewPage from './pages/dashboard/owner/OverviewPage';
@@ -202,6 +203,10 @@ export const routes: RouteObject[] = [
   {
     path: '/auth/staff-manager-login',
     element: <StaffManagerLoginPage />,
+  },
+  {
+    path: '/restaurant-login',
+    element: <RestaurantLoginPage />,
   },
   {
     path: '*',

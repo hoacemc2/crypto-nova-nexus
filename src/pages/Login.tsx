@@ -177,15 +177,15 @@ const Login = () => {
             </Link>
           </p>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-2">
             <span className="text-sm text-muted-foreground">Are you Staff or Manager?</span>
             <Button
               type="button"
               variant="secondary"
-              className="w-full mt-2"
-              onClick={() => navigate('/auth/staff-manager-login')}
+              className="w-full"
+              onClick={() => navigate('/restaurant-login')}
             >
-              Staff / Manager Login
+              Restaurant Staff Login
             </Button>
           </div>
         </CardContent>

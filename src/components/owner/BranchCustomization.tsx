@@ -72,6 +72,8 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
   const [avatarUrl, setAvatarUrl] = useState(branch.logoUrl || '');
   const [bannerUrl, setBannerUrl] = useState(branch.bannerUrl || '');
   const [selectedTheme, setSelectedTheme] = useState(branch.colorTheme || 'elegant-dark');
+  const [avatarPreview, setAvatarPreview] = useState(branch.logoUrl || '');
+  const [bannerPreview, setBannerPreview] = useState(branch.bannerUrl || '');
 
   const handleSave = () => {
     const branches = JSON.parse(localStorage.getItem('mock_branches') || '[]');
@@ -88,18 +90,48 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
     });
   };
 
-  const handleImageUpload = (type: 'avatar' | 'banner') => {
-    // Mock image upload - in production, this would handle actual file uploads
-    const mockUrl = `https://images.unsplash.com/photo-${Date.now()}?w=800&q=80`;
-    if (type === 'avatar') {
-      setAvatarUrl(mockUrl);
-    } else {
-      setBannerUrl(mockUrl);
+  const handleImageUpload = (type: 'avatar' | 'banner', event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        variant: 'destructive',
+        title: 'Invalid file type',
+        description: 'Please upload an image file.',
+      });
+      return;
     }
-    toast({
-      title: 'Image Uploaded',
-      description: `${type === 'avatar' ? 'Logo' : 'Banner'} image has been uploaded.`,
-    });
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+      toast({
+        variant: 'destructive',
+        title: 'File too large',
+        description: 'Image must be less than 5MB.',
+      });
+      return;
+    }
+
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      if (type === 'avatar') {
+        setAvatarPreview(dataUrl);
+        setAvatarUrl(dataUrl);
+      } else {
+        setBannerPreview(dataUrl);
+        setBannerUrl(dataUrl);
+      }
+      toast({
+        title: 'Image Uploaded',
+        description: `${type === 'avatar' ? 'Logo' : 'Banner'} image has been uploaded.`,
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -114,8 +146,8 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
             <div className="space-y-3">
               <Label>Restaurant Logo</Label>
               <div className="aspect-square rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/30 overflow-hidden">
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="Logo" className="w-full h-full object-cover" />
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
                   <div className="text-center text-muted-foreground">
                     <ImagePlus className="h-12 w-12 mx-auto mb-2" />
@@ -123,15 +155,18 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
                   </div>
                 )}
               </div>
-              <Input
-                placeholder="Image URL"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageUpload('avatar', e)}
               />
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => handleImageUpload('avatar')}
+                onClick={() => document.getElementById('avatar-upload')?.click()}
+                type="button"
               >
                 <ImagePlus className="mr-2 h-4 w-4" />
                 Upload Logo
@@ -141,8 +176,8 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
             <div className="space-y-3">
               <Label>Banner Image</Label>
               <div className="aspect-video rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/30 overflow-hidden">
-                {bannerUrl ? (
-                  <img src={bannerUrl} alt="Banner" className="w-full h-full object-cover" />
+                {bannerPreview ? (
+                  <img src={bannerPreview} alt="Banner" className="w-full h-full object-cover" />
                 ) : (
                   <div className="text-center text-muted-foreground">
                     <ImagePlus className="h-12 w-12 mx-auto mb-2" />
@@ -150,15 +185,18 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
                   </div>
                 )}
               </div>
-              <Input
-                placeholder="Image URL"
-                value={bannerUrl}
-                onChange={(e) => setBannerUrl(e.target.value)}
+              <input
+                id="banner-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handleImageUpload('banner', e)}
               />
               <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => handleImageUpload('banner')}
+                onClick={() => document.getElementById('banner-upload')?.click()}
+                type="button"
               >
                 <ImagePlus className="mr-2 h-4 w-4" />
                 Upload Banner
