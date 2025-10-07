@@ -18,8 +18,8 @@ export default function RestaurantLoginPage() {
             <CardTitle className="text-2xl">Restaurant Staff Login</CardTitle>
             <CardDescription className="text-base">
               {selectedRestaurant 
-                ? `Login to ${selectedRestaurant.name}` 
-                : 'Select your restaurant to continue'}
+                ? `Login to ${selectedRestaurant.brandName} - ${selectedRestaurant.name}` 
+                : 'Select your branch to continue'}
             </CardDescription>
           </div>
         </CardHeader>
