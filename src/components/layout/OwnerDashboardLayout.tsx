@@ -88,7 +88,7 @@ const OwnerDashboardLayout = ({ children }: OwnerDashboardLayoutProps) => {
               <UtensilsCrossed className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <span className="text-xl font-bold block">RestaurantOS</span>
+              <span className="text-xl font-bold block">HillDevilOS</span>
               <span className="text-xs text-muted-foreground">Owner Portal</span>
             </div>
           </Link>

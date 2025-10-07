@@ -92,7 +92,7 @@ const Login = () => {
           </div>
           <div>
             <CardTitle className="text-2xl">Welcome Back</CardTitle>
-            <CardDescription className="text-base">Sign in to your RestaurantOS account</CardDescription>
+            <CardDescription className="text-base">Sign in to your HillDevilOS account</CardDescription>
           </div>
         </CardHeader>
         <CardContent>

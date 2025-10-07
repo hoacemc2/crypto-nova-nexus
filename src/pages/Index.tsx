@@ -58,17 +58,17 @@ const prBrands = [
   {
     name: 'The Gourmet Kitchen',
     logo: '/placeholder.svg',
-    description: 'Fine dining experience with international cuisine. Proudly powered by RestaurantOS.'
+    description: 'Fine dining experience with international cuisine. Proudly powered by HillDevilOS.'
   },
   {
     name: 'Quick Bites Express',
     logo: '/placeholder.svg',
-    description: 'Fast casual dining with fresh ingredients. RestaurantOS partner.'
+    description: 'Fast casual dining with fresh ingredients. HillDevilOS partner.'
   },
   {
     name: 'Seafood Paradise',
     logo: '/placeholder.svg',
-    description: 'Premium seafood and coastal cuisine. RestaurantOS client.'
+    description: 'Premium seafood and coastal cuisine. HillDevilOS client.'
   },
 ];
 
@@ -275,7 +275,7 @@ const Index = () => {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h2 className="text-3xl font-bold sm:text-4xl mb-4">Our Featured Restaurant Brands</h2>
             <p className="text-lg text-muted-foreground">
-              These brands trust RestaurantOS to power their operations
+              These brands trust HillDevilOS to power their operations
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -298,7 +298,7 @@ const Index = () => {
           <div className="text-center max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold sm:text-4xl mb-4">Ready to Transform Your Restaurant?</h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Join hundreds of restaurant chains already using RestaurantOS
+              Join hundreds of restaurant chains already using HillDevilOS
             </p>
             <Link to="/register">
               <Button variant="hero" size="lg" className="shadow-large">
@@ -317,10 +317,10 @@ const Index = () => {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-primary">
                 <UtensilsCrossed className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-semibold">RestaurantOS</span>
+              <span className="font-semibold">HilldevilOS</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2024 RestaurantOS. All rights reserved.
+              © 2024 HillDevilOS. All rights reserved.
             </p>
           </div>
         </div>

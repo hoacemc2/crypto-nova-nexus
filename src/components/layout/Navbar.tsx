@@ -52,7 +52,7 @@ export const Navbar = () => {
           <div className="flex h-10 w-10 items-center justify-center rounded-lg gradient-primary">
             <UtensilsCrossed className="h-6 w-6 text-primary-foreground" />
           </div>
-          <span className="text-xl font-bold">RestaurantOS</span>
+          <span className="text-xl font-bold">HillDevilOS</span>
         </Link>
 
         <div className="flex items-center gap-4">
