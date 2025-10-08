@@ -1,59 +1,42 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/store/authStore';
 import {
-  LayoutDashboard,
+  Calendar,
   Users,
-  Table2,
-  Tag,
-  Building2,
+  MessageSquare,
   UtensilsCrossed,
   LogOut,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
 
 const menuItems = [
   { 
-    id: 'overview',
-    path: '/dashboard/manager',
-    icon: LayoutDashboard,
-    label: 'Overview',
-    description: 'Dashboard summary'
-  },
-  { 
-    id: 'branch',
-    path: '/dashboard/manager/branch',
-    icon: Building2,
-    label: 'Branch Info',
-    description: 'Branch details'
+    id: 'reservations',
+    path: '/dashboard/receptionist/reservations',
+    icon: Calendar,
+    label: 'Reservations',
+    description: 'Manage bookings'
   },
   { 
     id: 'tables',
-    path: '/dashboard/manager/tables',
-    icon: Table2,
-    label: 'Tables',
-    description: 'Table management'
-  },
-  { 
-    id: 'staff',
-    path: '/dashboard/manager/staff',
+    path: '/dashboard/receptionist/tables',
     icon: Users,
-    label: 'Staff',
-    description: 'Staff management'
+    label: 'Tables',
+    description: 'Table assignments'
   },
   { 
-    id: 'promotions',
-    path: '/dashboard/manager/promotions',
-    icon: Tag,
-    label: 'Promotions',
-    description: 'Manage promotions'
+    id: 'communications',
+    path: '/dashboard/receptionist/communications',
+    icon: MessageSquare,
+    label: 'Communications',
+    description: 'Customer contacts'
   },
 ];
 
-export const ManagerSidebar = () => {
+export const ReceptionistSidebar = () => {
   const location = useLocation();
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
@@ -64,7 +47,7 @@ export const ManagerSidebar = () => {
   };
 
   const isActiveRoute = (path: string) => {
-    return location.pathname === path || (path === '/dashboard/manager' && location.pathname === '/dashboard/manager');
+    return location.pathname === path || (path === '/dashboard/receptionist/reservations' && location.pathname === '/dashboard/receptionist');
   };
 
   const branchName = localStorage.getItem('selected_branch_name') || 'Branch';
@@ -72,13 +55,13 @@ export const ManagerSidebar = () => {
   return (
     <aside className="w-72 border-r bg-card shadow-soft flex flex-col fixed h-screen">
       <div className="p-6 border-b">
-        <Link to="/dashboard/manager" className="flex items-center gap-2">
+        <Link to="/dashboard/receptionist" className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg gradient-primary">
             <UtensilsCrossed className="h-6 w-6 text-primary-foreground" />
           </div>
           <div>
             <span className="text-xl font-bold block">HillDevilOS</span>
-            <span className="text-xs text-muted-foreground">Manager Portal</span>
+            <span className="text-xs text-muted-foreground">Receptionist Portal</span>
           </div>
         </Link>
       </div>
@@ -121,14 +104,14 @@ export const ManagerSidebar = () => {
         <div className="flex items-center gap-3 mb-4 p-3 rounded-lg bg-card">
           <Avatar className="h-10 w-10">
             <AvatarFallback className="gradient-primary text-primary-foreground">
-              {user?.name?.charAt(0) || 'M'}
+              {user?.name?.charAt(0) || 'R'}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{user?.name || 'Manager'}</p>
+            <p className="text-sm font-medium truncate">{user?.name || 'Receptionist'}</p>
             <div className="flex items-center gap-1 mt-0.5">
               <Badge variant="secondary" className="text-xs px-1.5 py-0">
-                {user?.role === 'branch_manager' ? 'Manager' : user?.role || 'Manager'}
+                Receptionist
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground truncate mt-0.5">{branchName}</p>
