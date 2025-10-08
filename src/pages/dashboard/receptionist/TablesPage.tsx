@@ -7,9 +7,10 @@ import { Users, CheckCircle, AlertCircle, Clock } from 'lucide-react';
 const TablesPage = () => {
   const { user } = useAuthStore();
   const branchId = user?.branchId || '';
-  const { tables } = useTableStore();
+  const { getTablesByBranchAndFloor } = useTableStore();
 
-  const branchTables = tables.filter(t => t.branchId === branchId && t.status !== 'out_of_service');
+  const floorMap = getTablesByBranchAndFloor(branchId);
+  const branchTables = Array.from(floorMap.values()).flat().filter(t => t.status !== 'out_of_service');
   const availableTables = branchTables.filter(t => t.status === 'available');
   const occupiedTables = branchTables.filter(t => t.status === 'occupied');
 
@@ -69,47 +70,71 @@ const TablesPage = () => {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {branchTables.map((table) => (
-          <Card key={table.id}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div className="flex items-center gap-2">
-                  {getStatusIcon(table.status)}
-                  <CardTitle className="text-lg">Table {table.number}</CardTitle>
+      <div className="space-y-6">
+        {Array.from(floorMap.keys()).sort((a, b) => a - b).map((floor) => {
+          const floorTables = (floorMap.get(floor) || [])
+            .filter(t => t.status !== 'out_of_service')
+            .sort((a, b) => a.number - b.number);
+          
+          if (floorTables.length === 0) return null;
+          
+          return (
+            <div key={floor} className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/10 rounded-lg px-4 py-2">
+                  <h3 className="text-lg font-semibold text-primary">Floor {floor}</h3>
                 </div>
-                <Badge variant={getStatusColor(table.status)}>
-                  {table.status}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Users className="h-4 w-4" />
-                <span>Capacity: {table.capacity} guests</span>
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-sm text-muted-foreground">
+                  {floorTables.length} table{floorTables.length !== 1 ? 's' : ''}
+                </span>
               </div>
 
-              {table.reservationName && table.reservationStart && (
-                <div className="p-3 bg-muted rounded-lg space-y-1">
-                  <div className="text-sm font-semibold">
-                    Reservation: {table.reservationName}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {new Date(table.reservationStart).toLocaleString()}
-                  </div>
-                </div>
-              )}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {floorTables.map((table) => (
+                  <Card key={table.id}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                          {getStatusIcon(table.status)}
+                          <CardTitle className="text-lg">Table {table.number}</CardTitle>
+                        </div>
+                        <Badge variant={getStatusColor(table.status)}>
+                          {table.status}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Users className="h-4 w-4" />
+                        <span>Capacity: {table.capacity} guests</span>
+                      </div>
 
-              {table.status === 'occupied' && (
-                <div className="p-3 bg-muted rounded-lg space-y-1">
-                  <div className="text-sm font-semibold">
-                    Currently occupied
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+                      {table.reservationName && table.reservationStart && (
+                        <div className="p-3 bg-muted rounded-lg space-y-1">
+                          <div className="text-sm font-semibold">
+                            Reservation: {table.reservationName}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(table.reservationStart).toLocaleString()}
+                          </div>
+                        </div>
+                      )}
+
+                      {table.status === 'occupied' && (
+                        <div className="p-3 bg-muted rounded-lg space-y-1">
+                          <div className="text-sm font-semibold">
+                            Currently occupied
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

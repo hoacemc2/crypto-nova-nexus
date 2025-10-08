@@ -13,9 +13,10 @@ interface TableStatusViewProps {
 export const TableStatusView = ({ branchId }: TableStatusViewProps) => {
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
   const [selectedTable, setSelectedTable] = useState<any>(null);
-  const { getTablesByBranch } = useTableStore();
+  const { getTablesByBranchAndFloor } = useTableStore();
 
-  const tables = getTablesByBranch(branchId);
+  const floorMap = getTablesByBranchAndFloor(branchId);
+  const tables = Array.from(floorMap.values()).flat();
 
   const handleShowQR = (table: any) => {
     setSelectedTable(table);
@@ -112,53 +113,74 @@ export const TableStatusView = ({ branchId }: TableStatusViewProps) => {
               <p>No tables found for this branch.</p>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {tables.map((table) => (
-                <Card key={table.id} className="border-2 hover:shadow-lg transition-shadow">
-                  <CardContent className="pt-6">
-                    <div className="space-y-4">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <Table2 className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-semibold text-lg">Table {table.number}</span>
-                          </div>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Capacity: {table.capacity} guests
-                          </p>
-                        </div>
-                        <Badge variant={getStatusVariant(table.status)}>
-                          {table.status}
-                        </Badge>
+            <div className="space-y-6">
+              {Array.from(floorMap.keys()).sort((a, b) => a - b).map((floor) => {
+                const floorTables = floorMap.get(floor) || [];
+                const sortedTables = floorTables.sort((a, b) => a.number - b.number);
+                
+                return (
+                  <div key={floor} className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 rounded-lg px-4 py-2">
+                        <h3 className="text-lg font-semibold text-primary">Floor {floor}</h3>
                       </div>
-
-                      {table.reservationStart && (
-                        <div className="text-xs bg-muted/50 p-2 rounded">
-                          <p className="font-medium">Reserved</p>
-                          <p className="text-muted-foreground">
-                            {new Date(table.reservationStart).toLocaleString()}
-                          </p>
-                          {table.reservationName && (
-                            <p className="text-muted-foreground">For: {table.reservationName}</p>
-                          )}
-                        </div>
-                      )}
-
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleShowQR(table)}
-                          className="flex-1"
-                        >
-                          <QrCode className="mr-1 h-3 w-3" />
-                          View QR Code
-                        </Button>
-                      </div>
+                      <div className="flex-1 h-px bg-border" />
+                      <span className="text-sm text-muted-foreground">
+                        {floorTables.length} table{floorTables.length !== 1 ? 's' : ''}
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {sortedTables.map((table) => (
+                        <Card key={table.id} className="border-2 hover:shadow-lg transition-shadow">
+                          <CardContent className="pt-6">
+                            <div className="space-y-4">
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <Table2 className="h-4 w-4 text-muted-foreground" />
+                                    <span className="font-semibold text-lg">Table {table.number}</span>
+                                  </div>
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    Capacity: {table.capacity} guests
+                                  </p>
+                                </div>
+                                <Badge variant={getStatusVariant(table.status)}>
+                                  {table.status}
+                                </Badge>
+                              </div>
+
+                              {table.reservationStart && (
+                                <div className="text-xs bg-muted/50 p-2 rounded">
+                                  <p className="font-medium">Reserved</p>
+                                  <p className="text-muted-foreground">
+                                    {new Date(table.reservationStart).toLocaleString()}
+                                  </p>
+                                  {table.reservationName && (
+                                    <p className="text-muted-foreground">For: {table.reservationName}</p>
+                                  )}
+                                </div>
+                              )}
+
+                              <div className="flex gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleShowQR(table)}
+                                  className="flex-1"
+                                >
+                                  <QrCode className="mr-1 h-3 w-3" />
+                                  View QR Code
+                                </Button>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </CardContent>

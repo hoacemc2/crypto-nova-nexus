@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/store/authStore';
-import { TableStatusView } from '@/components/manager/TableStatusView';
+import { ManagerTableManagement } from '@/components/manager/ManagerTableManagement';
 
 export default function TablesPage() {
   const { user } = useAuthStore();
@@ -8,13 +8,13 @@ export default function TablesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Table Status</h1>
+        <h1 className="text-3xl font-bold">Table Management</h1>
         <p className="text-muted-foreground mt-2">
-          Monitor table availability and reservations
+          Manage table status and availability
         </p>
       </div>
 
-      <TableStatusView branchId={branchId} />
+      <ManagerTableManagement branchId={branchId} />
     </div>
   );
 }
