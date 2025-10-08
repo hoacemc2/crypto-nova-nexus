@@ -3,159 +3,123 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { ImagePlus, Save, Palette } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { Badge } from '@/components/ui/badge';
+import { Check, Upload, X, Image as ImageIcon, Moon, Sun } from 'lucide-react';
+import { PREDEFINED_THEMES, getDarkThemes, getLightThemes } from '@/lib/themes';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface BranchCustomizationProps {
   branch: any;
 }
 
-const COLOR_THEMES = [
-  {
-    id: 'elegant-dark',
-    name: 'Elegant Dark',
-    colors: {
-      primary: '240 5% 15%',
-      secondary: '240 5% 25%',
-      accent: '43 74% 66%',
-    },
-  },
-  {
-    id: 'ocean-blue',
-    name: 'Ocean Blue',
-    colors: {
-      primary: '203 89% 53%',
-      secondary: '203 89% 43%',
-      accent: '173 58% 39%',
-    },
-  },
-  {
-    id: 'sunset-orange',
-    name: 'Sunset Orange',
-    colors: {
-      primary: '24 95% 53%',
-      secondary: '31 100% 71%',
-      accent: '340 82% 52%',
-    },
-  },
-  {
-    id: 'forest-green',
-    name: 'Forest Green',
-    colors: {
-      primary: '142 71% 45%',
-      secondary: '142 76% 36%',
-      accent: '160 84% 39%',
-    },
-  },
-  {
-    id: 'royal-purple',
-    name: 'Royal Purple',
-    colors: {
-      primary: '271 81% 56%',
-      secondary: '271 91% 65%',
-      accent: '291 47% 51%',
-    },
-  },
-  {
-    id: 'rose-gold',
-    name: 'Rose Gold',
-    colors: {
-      primary: '340 82% 52%',
-      secondary: '24 95% 53%',
-      accent: '43 74% 66%',
-    },
-  },
-];
-
 export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
+  // Get user's package from localStorage
+  const userPackage = localStorage.getItem('user_package') || 'basic';
+  
   const [avatarUrl, setAvatarUrl] = useState(branch.logoUrl || '');
   const [bannerUrl, setBannerUrl] = useState(branch.bannerUrl || '');
-  const [selectedTheme, setSelectedTheme] = useState(branch.colorTheme || 'elegant-dark');
+  const [selectedTheme, setSelectedTheme] = useState(branch.selectedThemeId || 'midnight');
   const [avatarPreview, setAvatarPreview] = useState(branch.logoUrl || '');
   const [bannerPreview, setBannerPreview] = useState(branch.bannerUrl || '');
+  const [layout, setLayout] = useState(branch.layout || 'default');
+  const [galleryImages, setGalleryImages] = useState<string[]>(branch.galleryImages || []);
+  const [sliderImages, setSliderImages] = useState<string[]>(branch.sliderImages || []);
 
   const handleThemeChange = (themeId: string) => {
     setSelectedTheme(themeId);
-    const theme = COLOR_THEMES.find(t => t.id === themeId);
-    if (theme) {
-      toast({
-        title: 'Theme Preview',
-        description: 'Colors will be applied when you save changes.',
-      });
-    }
+    const theme = PREDEFINED_THEMES.find(t => t.id === themeId);
+    toast({
+      title: 'Theme Preview',
+      description: `Previewing ${theme?.name} theme. Click Save to apply.`,
+    });
   };
 
   const handleSave = () => {
     const branches = JSON.parse(localStorage.getItem('mock_branches') || '[]');
-    const theme = COLOR_THEMES.find(t => t.id === selectedTheme);
+    const theme = PREDEFINED_THEMES.find(t => t.id === selectedTheme);
     
     const updatedBranches = branches.map((b: any) =>
-      b.id === branch.id 
-        ? { 
-            ...b, 
-            logoUrl: avatarUrl, 
-            bannerUrl: bannerUrl, 
-            colorTheme: selectedTheme,
-            // Apply theme colors to branch
-            heroBackground: theme?.colors.primary,
-            heroAccent: theme?.colors.accent,
-            buttonPrimary: theme?.colors.accent,
-            cardBorder: theme?.colors.secondary,
-          } 
+      b.id === branch.id
+        ? {
+            ...b,
+            logoUrl: avatarPreview || avatarUrl,
+            bannerUrl: bannerPreview || bannerUrl,
+            selectedThemeId: selectedTheme,
+            themeColors: theme?.colors,
+            layout,
+            galleryImages,
+            sliderImages,
+          }
         : b
     );
     localStorage.setItem('mock_branches', JSON.stringify(updatedBranches));
-    
+
     toast({
       title: 'Customization Saved',
-      description: 'Branch appearance settings and theme have been updated.',
+      description: 'Your branch customization has been updated successfully.',
     });
   };
 
-  const handleImageUpload = (type: 'avatar' | 'banner', event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (type: 'avatar' | 'banner' | 'gallery' | 'slider', event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
+    // Check file type
     if (!file.type.startsWith('image/')) {
       toast({
-        variant: 'destructive',
-        title: 'Invalid file type',
+        title: 'Invalid File Type',
         description: 'Please upload an image file.',
-      });
-      return;
-    }
-
-    // Validate file size (5MB max)
-    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-    if (file.size > maxSize) {
-      toast({
         variant: 'destructive',
-        title: 'File too large',
-        description: 'Image must be less than 5MB.',
       });
       return;
     }
 
-    // Create preview URL
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'File Too Large',
+        description: 'Please upload an image smaller than 5MB.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Create a data URL for preview
     const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string;
+    reader.onloadend = () => {
+      const dataUrl = reader.result as string;
       if (type === 'avatar') {
         setAvatarPreview(dataUrl);
         setAvatarUrl(dataUrl);
-      } else {
+      } else if (type === 'banner') {
         setBannerPreview(dataUrl);
         setBannerUrl(dataUrl);
+      } else if (type === 'gallery') {
+        setGalleryImages(prev => [...prev, dataUrl]);
+      } else if (type === 'slider') {
+        setSliderImages(prev => [...prev, dataUrl]);
       }
-      toast({
-        title: 'Image Uploaded',
-        description: `${type === 'avatar' ? 'Logo' : 'Banner'} image has been uploaded.`,
-      });
     };
     reader.readAsDataURL(file);
+
+    toast({
+      title: 'Image Uploaded',
+      description: `Image uploaded successfully. Click Save to apply.`,
+    });
   };
+
+  const removeGalleryImage = (index: number) => {
+    setGalleryImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeSliderImage = (index: number) => {
+    setSliderImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const canCustomizeTheme = userPackage !== 'basic';
+  const canCustomizeLayout = userPackage === 'pro' || userPackage === 'enterprise';
+  const canUseSlider = userPackage === 'enterprise';
 
   return (
     <div className="space-y-6">
@@ -173,27 +137,17 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
                   <img src={avatarPreview} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
                   <div className="text-center text-muted-foreground">
-                    <ImagePlus className="h-12 w-12 mx-auto mb-2" />
+                    <ImageIcon className="h-12 w-12 mx-auto mb-2" />
                     <p className="text-sm">No logo uploaded</p>
                   </div>
                 )}
               </div>
-              <input
-                id="avatar-upload"
+              <Input
                 type="file"
                 accept="image/*"
-                className="hidden"
                 onChange={(e) => handleImageUpload('avatar', e)}
+                className="cursor-pointer"
               />
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => document.getElementById('avatar-upload')?.click()}
-                type="button"
-              >
-                <ImagePlus className="mr-2 h-4 w-4" />
-                Upload Logo
-              </Button>
             </div>
 
             <div className="space-y-3">
@@ -203,27 +157,17 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
                   <img src={bannerPreview} alt="Banner" className="w-full h-full object-cover" />
                 ) : (
                   <div className="text-center text-muted-foreground">
-                    <ImagePlus className="h-12 w-12 mx-auto mb-2" />
+                    <ImageIcon className="h-12 w-12 mx-auto mb-2" />
                     <p className="text-sm">No banner uploaded</p>
                   </div>
                 )}
               </div>
-              <input
-                id="banner-upload"
+              <Input
                 type="file"
                 accept="image/*"
-                className="hidden"
                 onChange={(e) => handleImageUpload('banner', e)}
+                className="cursor-pointer"
               />
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => document.getElementById('banner-upload')?.click()}
-                type="button"
-              >
-                <ImagePlus className="mr-2 h-4 w-4" />
-                Upload Banner
-              </Button>
             </div>
           </div>
         </CardContent>
@@ -231,63 +175,202 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Palette className="h-5 w-5" />
-            Color Theme
-          </CardTitle>
+          <CardTitle>Theme Selection</CardTitle>
           <CardDescription>
-            Choose a color theme for your branch menu and landing page
+            {canCustomizeTheme 
+              ? 'Choose from pre-made themes with different color schemes and backgrounds'
+              : 'Upgrade to Pro or Enterprise to unlock theme customization'}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
-            {COLOR_THEMES.map((theme) => (
-              <button
-                key={theme.id}
-                onClick={() => handleThemeChange(theme.id)}
-                className={`p-4 rounded-lg border-2 transition-all ${
-                  selectedTheme === theme.id
-                    ? 'border-primary shadow-lg'
-                    : 'border-border hover:border-muted-foreground'
-                }`}
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{theme.name}</span>
-                    {selectedTheme === theme.id && (
-                      <Badge variant="default">Selected</Badge>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <div
-                      className="h-12 flex-1 rounded"
-                      style={{ backgroundColor: `hsl(${theme.colors.primary})` }}
-                      title="Primary"
-                    />
-                    <div
-                      className="h-12 flex-1 rounded"
-                      style={{ backgroundColor: `hsl(${theme.colors.secondary})` }}
-                      title="Secondary"
-                    />
-                    <div
-                      className="h-12 flex-1 rounded"
-                      style={{ backgroundColor: `hsl(${theme.colors.accent})` }}
-                      title="Accent"
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground text-left">
-                    Applies to hero, buttons & accents
-                  </p>
+          {!canCustomizeTheme ? (
+            <div className="text-center py-8 bg-muted/50 rounded-lg">
+              <p className="text-muted-foreground mb-4">Theme customization is available in Pro and Enterprise packages</p>
+              <Button variant="outline" disabled>Upgrade to Unlock</Button>
+            </div>
+          ) : (
+            <Tabs defaultValue="dark" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="dark" className="flex items-center gap-2">
+                  <Moon className="h-4 w-4" />
+                  Dark Themes
+                </TabsTrigger>
+                <TabsTrigger value="light" className="flex items-center gap-2">
+                  <Sun className="h-4 w-4" />
+                  Light Themes
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="dark" className="mt-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {getDarkThemes().map((theme) => (
+                    <button
+                      key={theme.id}
+                      onClick={() => handleThemeChange(theme.id)}
+                      className={`relative p-4 rounded-lg border-2 transition-all hover:shadow-md ${
+                        selectedTheme === theme.id
+                          ? 'border-primary shadow-medium'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      {selectedTheme === theme.id && (
+                        <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full p-1">
+                          <Check className="h-4 w-4" />
+                        </div>
+                      )}
+                      <div className="space-y-3">
+                        <h3 className="font-semibold text-left">{theme.name}</h3>
+                        <div className="h-20 rounded-md border overflow-hidden" style={{ backgroundColor: `hsl(${theme.colors.pageBackground})` }}>
+                          <div className="h-1/2" style={{ backgroundColor: `hsl(${theme.colors.heroBackground})` }}></div>
+                        </div>
+                        <div className="flex gap-2">
+                          <div className="w-8 h-8 rounded-md border" style={{ backgroundColor: `hsl(${theme.colors.heroAccent})` }} />
+                          <div className="w-8 h-8 rounded-md border" style={{ backgroundColor: `hsl(${theme.colors.buttonPrimary})` }} />
+                          <div className="w-8 h-8 rounded-md border" style={{ backgroundColor: `hsl(${theme.colors.cardBackground})` }} />
+                        </div>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-              </button>
-            ))}
-          </div>
+              </TabsContent>
+              
+              <TabsContent value="light" className="mt-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  {getLightThemes().map((theme) => (
+                    <button
+                      key={theme.id}
+                      onClick={() => handleThemeChange(theme.id)}
+                      className={`relative p-4 rounded-lg border-2 transition-all hover:shadow-md ${
+                        selectedTheme === theme.id
+                          ? 'border-primary shadow-medium'
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                    >
+                      {selectedTheme === theme.id && (
+                        <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full p-1">
+                          <Check className="h-4 w-4" />
+                        </div>
+                      )}
+                      <div className="space-y-3">
+                        <h3 className="font-semibold text-left">{theme.name}</h3>
+                        <div className="h-20 rounded-md border overflow-hidden" style={{ backgroundColor: `hsl(${theme.colors.pageBackground})` }}>
+                          <div className="h-1/2" style={{ backgroundColor: `hsl(${theme.colors.heroBackground})` }}></div>
+                        </div>
+                        <div className="flex gap-2">
+                          <div className="w-8 h-8 rounded-md border" style={{ backgroundColor: `hsl(${theme.colors.heroAccent})` }} />
+                          <div className="w-8 h-8 rounded-md border" style={{ backgroundColor: `hsl(${theme.colors.buttonPrimary})` }} />
+                          <div className="w-8 h-8 rounded-md border" style={{ backgroundColor: `hsl(${theme.colors.cardBackground})` }} />
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
+          )}
         </CardContent>
       </Card>
 
+      {canCustomizeLayout && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Layout Options</CardTitle>
+            <CardDescription>Choose how your landing page is displayed</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="layout">Page Layout</Label>
+                <Select value={layout} onValueChange={setLayout}>
+                  <SelectTrigger id="layout">
+                    <SelectValue placeholder="Select layout" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="default">Default (Hero + Menu Grid)</SelectItem>
+                    <SelectItem value="centered">Centered Content</SelectItem>
+                    <SelectItem value="sidebar">Sidebar Menu</SelectItem>
+                    <SelectItem value="masonry">Masonry Gallery</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-3">
+                <Label>Gallery Images</Label>
+                <p className="text-sm text-muted-foreground">Add multiple images to create a beautiful gallery showcase</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {galleryImages.map((img, index) => (
+                    <div key={index} className="relative group">
+                      <img src={img} alt={`Gallery ${index + 1}`} className="w-full h-24 object-cover rounded-lg border" />
+                      <button
+                        onClick={() => removeGalleryImage(index)}
+                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <Label htmlFor="gallery-upload" className="flex flex-col items-center justify-center h-24 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                    <Upload className="h-6 w-6 mb-1 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">Add Image</span>
+                    <Input
+                      id="gallery-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleImageUpload('gallery', e)}
+                    />
+                  </Label>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {canUseSlider && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Image Slider</CardTitle>
+            <CardDescription>Create a continuously scrolling horizontal image slider</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="grid grid-cols-4 gap-3">
+                {sliderImages.map((img, index) => (
+                  <div key={index} className="relative group">
+                    <img src={img} alt={`Slider ${index + 1}`} className="w-full h-20 object-cover rounded-lg border" />
+                    <button
+                      onClick={() => removeSliderImage(index)}
+                      className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+                <Label htmlFor="slider-upload" className="flex flex-col items-center justify-center h-20 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                  <ImageIcon className="h-6 w-6 mb-1 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Add</span>
+                  <Input
+                    id="slider-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleImageUpload('slider', e)}
+                  />
+                </Label>
+              </div>
+              {sliderImages.length > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  The slider will continuously scroll these images horizontally across the page
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="flex justify-end">
         <Button onClick={handleSave} size="lg">
-          <Save className="mr-2 h-4 w-4" />
           Save All Changes
         </Button>
       </div>

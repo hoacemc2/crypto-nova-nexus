@@ -23,21 +23,42 @@ const packages = [
     price: '$49/month',
     icon: Store,
     features: ['1-3 Branches', 'Basic Analytics', 'Email Support', 'QR Ordering'],
+    customization: {
+      landing: false,
+      theme: false,
+      layout: false,
+      avatarBanner: true,
+    }
   },
   {
     id: 'pro',
     name: 'Professional',
     price: '$99/month',
     icon: Building2,
-    features: ['Up to 10 Branches', 'Advanced Analytics', 'Priority Support', 'Custom Branding', 'Staff Management'],
+    features: ['Up to 10 Branches', 'Advanced Analytics', 'Priority Support', 'Custom Branding', 'Staff Management', 'Theme Customization', 'Layout Options'],
     popular: true,
+    customization: {
+      landing: true,
+      theme: true,
+      layout: true,
+      avatarBanner: true,
+      imageGallery: true,
+    }
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
     price: 'Custom',
     icon: Warehouse,
-    features: ['Unlimited Branches', 'Real-time Analytics', '24/7 Support', 'White Label', 'API Access', 'Dedicated Manager'],
+    features: ['Unlimited Branches', 'Real-time Analytics', '24/7 Support', 'White Label', 'API Access', 'Dedicated Manager', 'Full Customization', 'Image Sliders'],
+    customization: {
+      landing: true,
+      theme: true,
+      layout: true,
+      avatarBanner: true,
+      imageGallery: true,
+      slider: true,
+    }
   },
 ];
 
