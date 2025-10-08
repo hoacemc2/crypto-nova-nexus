@@ -74,11 +74,18 @@ const OrdersPage = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  {order.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <span>{item.quantity}x {item.name}</span>
-                      <span>${(item.quantity * item.price).toFixed(2)}</span>
+                <div className="space-y-3">
+                  {order.orderLines.map((line, lineIdx) => (
+                    <div key={line.id} className="space-y-2 p-2 bg-muted/30 rounded">
+                      <div className="text-xs text-muted-foreground">
+                        Line {lineIdx + 1} - {new Date(line.createdAt).toLocaleTimeString()}
+                      </div>
+                      {line.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between text-sm">
+                          <span>{item.quantity}x {item.name}</span>
+                          <span>${(item.quantity * item.price).toFixed(2)}</span>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
@@ -130,11 +137,18 @@ const OrdersPage = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  {order.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <span>{item.quantity}x {item.name}</span>
-                      <span>${(item.quantity * item.price).toFixed(2)}</span>
+                <div className="space-y-3">
+                  {order.orderLines.map((line, lineIdx) => (
+                    <div key={line.id} className="space-y-2 p-2 bg-muted/30 rounded">
+                      <div className="text-xs text-muted-foreground">
+                        Line {lineIdx + 1} - {new Date(line.createdAt).toLocaleTimeString()}
+                      </div>
+                      {line.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between text-sm">
+                          <span>{item.quantity}x {item.name}</span>
+                          <span>${(item.quantity * item.price).toFixed(2)}</span>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
