@@ -29,8 +29,10 @@ export const OrderManagement = () => {
       const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
       const matchesSearch = !searchQuery || 
         order.tableNumber?.includes(searchQuery) ||
-        order.items.some(item => item.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        order.notes?.toLowerCase().includes(searchQuery.toLowerCase());
+        order.orderLines.some(line => 
+          line.items.some(item => item.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          line.notes?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
       const matchesDate = !dateFilter || 
         new Date(order.createdAt).toISOString().split('T')[0] === dateFilter;
 
@@ -81,22 +83,28 @@ export const OrderManagement = () => {
           <p className="font-bold text-lg">${order.total.toFixed(2)}</p>
         </div>
 
-        <div className="space-y-2 mb-4">
-          {order.items.map((item, index) => (
-            <div key={index} className="flex justify-between text-sm">
-              <span>{item.quantity}x {item.name}</span>
-              <span className="text-muted-foreground">
-                ${(item.price * item.quantity).toFixed(2)}
-              </span>
+        <div className="space-y-3 mb-4">
+          {order.orderLines.map((line, lineIdx) => (
+            <div key={line.id} className="space-y-2 p-2 bg-muted/30 rounded">
+              <div className="text-xs text-muted-foreground">
+                Line {lineIdx + 1} - {new Date(line.createdAt).toLocaleTimeString()}
+              </div>
+              {line.items.map((item, index) => (
+                <div key={index} className="flex justify-between text-sm">
+                  <span>{item.quantity}x {item.name}</span>
+                  <span className="text-muted-foreground">
+                    ${(item.price * item.quantity).toFixed(2)}
+                  </span>
+                </div>
+              ))}
+              {line.notes && (
+                <p className="text-xs text-muted-foreground italic">
+                  Note: {line.notes}
+                </p>
+              )}
             </div>
           ))}
         </div>
-
-        {order.notes && (
-          <p className="text-sm text-muted-foreground mb-4 italic">
-            Note: {order.notes}
-          </p>
-        )}
 
         {!order.billed && (
           <div className="flex gap-2">

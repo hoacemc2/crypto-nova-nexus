@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Receipt, Percent } from 'lucide-react';
+import { Receipt, Percent, Clock } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const BillingPage = () => {
@@ -65,11 +65,41 @@ const BillingPage = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  {order.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <span>{item.quantity}x {item.name}</span>
-                      <span>${(item.quantity * item.price).toFixed(2)}</span>
+                <div className="space-y-3">
+                  {order.orderLines.map((line, lineIdx) => (
+                    <div key={line.id} className="p-3 bg-muted/50 rounded-lg space-y-2">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        <span>{new Date(line.createdAt).toLocaleTimeString()}</span>
+                        <Badge variant="outline" className="ml-auto">
+                          Line {lineIdx + 1}
+                        </Badge>
+                      </div>
+                      <div className="space-y-1">
+                        {line.items.map((item, idx) => (
+                          <div key={idx}>
+                            <div className="flex justify-between text-sm">
+                              <span>{item.quantity}x {item.name}</span>
+                              <span>${(item.quantity * item.price).toFixed(2)}</span>
+                            </div>
+                            {item.customizations && item.customizations.length > 0 && (
+                              <div className="pl-4 text-xs text-muted-foreground">
+                                {item.customizations.map((custom, cIdx) => (
+                                  <div key={cIdx}>
+                                    + {custom.optionName}
+                                    {custom.price > 0 && ` (+$${custom.price.toFixed(2)})`}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      {line.notes && (
+                        <p className="text-xs text-muted-foreground italic">
+                          Note: {line.notes}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -108,11 +138,36 @@ const BillingPage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  {selectedOrderData.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between text-sm">
-                      <span>{item.quantity}x {item.name}</span>
-                      <span>${(item.quantity * item.price).toFixed(2)}</span>
+                <div className="space-y-3">
+                  {selectedOrderData.orderLines.map((line, lineIdx) => (
+                    <div key={line.id} className="p-3 bg-muted/50 rounded-lg space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-semibold">
+                        <Clock className="h-3 w-3" />
+                        <span>{new Date(line.createdAt).toLocaleTimeString()}</span>
+                        <Badge variant="outline" className="ml-auto">
+                          Line {lineIdx + 1}
+                        </Badge>
+                      </div>
+                      <div className="space-y-1">
+                        {line.items.map((item, idx) => (
+                          <div key={idx}>
+                            <div className="flex justify-between text-sm">
+                              <span>{item.quantity}x {item.name}</span>
+                              <span>${(item.quantity * item.price).toFixed(2)}</span>
+                            </div>
+                            {item.customizations && item.customizations.length > 0 && (
+                              <div className="pl-4 text-xs text-muted-foreground">
+                                {item.customizations.map((custom, cIdx) => (
+                                  <div key={cIdx}>
+                                    + {custom.optionName}
+                                    {custom.price > 0 && ` (+$${custom.price.toFixed(2)})`}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>

@@ -1,10 +1,26 @@
 import { create } from 'zustand';
 
+export interface OrderItemCustomization {
+  customizationId: string;
+  customizationName: string;
+  optionName: string;
+  price: number;
+}
+
 export interface OrderItem {
   menuItemId: string;
   name: string;
   quantity: number;
   price: number;
+  customizations?: OrderItemCustomization[];
+}
+
+export interface OrderLine {
+  id: string;
+  items: OrderItem[];
+  total: number;
+  createdAt: string;
+  notes?: string;
 }
 
 export interface Order {
@@ -14,11 +30,10 @@ export interface Order {
   guestName: string;
   guestPhone: string;
   tableNumber?: string;
-  items: OrderItem[];
+  orderLines: OrderLine[];
   total: number;
   createdAt: string;
   status: 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
-  notes?: string;
   billed?: boolean;
   billedAt?: string;
 }
@@ -26,10 +41,12 @@ export interface Order {
 interface OrderState {
   orders: Order[];
   addOrder: (order: Omit<Order, 'id' | 'status' | 'createdAt' | 'total'>) => void;
+  addOrderLine: (orderId: string, orderLine: Omit<OrderLine, 'id' | 'createdAt'>) => void;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
   markOrderAsBilled: (orderId: string) => void;
   getOrdersByBranch: (branchId?: string) => Order[];
   getOrdersByTable: (branchId: string, tableNumber: string) => Order[];
+  getActiveOrderByTable: (branchId: string, tableNumber: string) => Order | undefined;
   getPendingOrders: (branchId?: string) => Order[];
   getCompletedUnbilledOrders: (branchId: string, tableNumber?: string) => Order[];
 }
@@ -50,7 +67,7 @@ export const useOrderStore = create<OrderState>((set, get) => ({
 
   addOrder: (orderData) =>
     set((state) => {
-      const total = orderData.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const total = orderData.orderLines.reduce((sum, line) => sum + line.total, 0);
       const newOrder: Order = {
         ...orderData,
         id: Date.now().toString(),
@@ -60,8 +77,30 @@ export const useOrderStore = create<OrderState>((set, get) => ({
       };
       const updated = [newOrder, ...state.orders];
       saveOrders(updated);
-      // Notify staff/manager in localStorage for cross-tab
       localStorage.setItem('order_notification', JSON.stringify(newOrder));
+      return { orders: updated };
+    }),
+
+  addOrderLine: (orderId, orderLineData) =>
+    set((state) => {
+      const updated = state.orders.map((o) => {
+        if (o.id === orderId) {
+          const newOrderLine: OrderLine = {
+            ...orderLineData,
+            id: `${orderId}-line-${Date.now()}`,
+            createdAt: new Date().toISOString(),
+          };
+          const updatedOrderLines = [...o.orderLines, newOrderLine];
+          const newTotal = updatedOrderLines.reduce((sum, line) => sum + line.total, 0);
+          return {
+            ...o,
+            orderLines: updatedOrderLines,
+            total: newTotal,
+          };
+        }
+        return o;
+      });
+      saveOrders(updated);
       return { orders: updated };
     }),
 
@@ -93,6 +132,16 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     const allOrders = loadOrders();
     return allOrders.filter((order) => 
       order.branchId === branchId && order.tableNumber === tableNumber
+    );
+  },
+
+  getActiveOrderByTable: (branchId, tableNumber) => {
+    const { orders } = get();
+    return orders.find((o) => 
+      o.branchId === branchId && 
+      o.tableNumber === tableNumber && 
+      !o.billed &&
+      o.status !== 'cancelled'
     );
   },
 

@@ -5,11 +5,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useTableStore } from '@/store/tableStore';
 import { useMenuStore } from '@/store/menuStore';
-import { useOrderStore, OrderItem } from '@/store/orderStore';
+import { useOrderStore, OrderItem, OrderItemCustomization } from '@/store/orderStore';
 import { toast } from '@/hooks/use-toast';
 import { Plus, Trash2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface ManualOrderDialogProps {
   open: boolean;
@@ -20,6 +22,7 @@ interface ManualOrderDialogProps {
 interface OrderLineItem {
   menuItemId: string;
   quantity: number;
+  selectedCustomizations: Map<string, { optionName: string; price: number }>;
 }
 
 export const ManualOrderDialog = ({ open, onOpenChange, branchId }: ManualOrderDialogProps) => {
@@ -27,16 +30,24 @@ export const ManualOrderDialog = ({ open, onOpenChange, branchId }: ManualOrderD
   const tables = allTables.filter(t => t.branchId === branchId);
   const allMenuItems = useMenuStore((state) => state.items);
   const menuItems = allMenuItems.filter(item => item.branchId === branchId && item.available);
-  const addOrder = useOrderStore((state) => state.addOrder);
+  const { addOrder, addOrderLine, getActiveOrderByTable } = useOrderStore();
 
   const [selectedTable, setSelectedTable] = useState('');
-  const [orderLines, setOrderLines] = useState<OrderLineItem[]>([{ menuItemId: '', quantity: 1 }]);
+  const [orderLines, setOrderLines] = useState<OrderLineItem[]>([{ 
+    menuItemId: '', 
+    quantity: 1,
+    selectedCustomizations: new Map()
+  }]);
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [notes, setNotes] = useState('');
 
   const handleAddOrderLine = () => {
-    setOrderLines([...orderLines, { menuItemId: '', quantity: 1 }]);
+    setOrderLines([...orderLines, { 
+      menuItemId: '', 
+      quantity: 1,
+      selectedCustomizations: new Map()
+    }]);
   };
 
   const handleRemoveOrderLine = (index: number) => {
@@ -45,8 +56,53 @@ export const ManualOrderDialog = ({ open, onOpenChange, branchId }: ManualOrderD
 
   const handleOrderLineChange = (index: number, field: keyof OrderLineItem, value: string | number) => {
     const updated = [...orderLines];
-    updated[index] = { ...updated[index], [field]: value };
+    if (field === 'menuItemId') {
+      updated[index] = { 
+        ...updated[index], 
+        menuItemId: value as string,
+        selectedCustomizations: new Map() // Reset customizations when item changes
+      };
+    } else if (field === 'quantity') {
+      updated[index] = { ...updated[index], quantity: value as number };
+    }
     setOrderLines(updated);
+  };
+
+  const handleCustomizationChange = (
+    lineIndex: number, 
+    customizationId: string, 
+    customizationName: string,
+    optionName: string, 
+    price: number, 
+    checked: boolean
+  ) => {
+    const updated = [...orderLines];
+    const customizations = new Map(updated[lineIndex].selectedCustomizations);
+    
+    if (checked) {
+      customizations.set(customizationId, { optionName, price });
+    } else {
+      customizations.delete(customizationId);
+    }
+    
+    updated[lineIndex].selectedCustomizations = customizations;
+    setOrderLines(updated);
+  };
+
+  const calculateLineTotal = (line: OrderLineItem): number => {
+    const menuItem = menuItems.find(m => m.id === line.menuItemId);
+    if (!menuItem) return 0;
+    
+    let itemPrice = menuItem.price;
+    line.selectedCustomizations.forEach(custom => {
+      itemPrice += custom.price;
+    });
+    
+    return itemPrice * line.quantity;
+  };
+
+  const calculateTotal = (): number => {
+    return orderLines.reduce((sum, line) => sum + calculateLineTotal(line), 0);
   };
 
   const handleSubmit = () => {
@@ -71,32 +127,71 @@ export const ManualOrderDialog = ({ open, onOpenChange, branchId }: ManualOrderD
 
     const items: OrderItem[] = validOrderLines.map(line => {
       const menuItem = menuItems.find(m => m.id === line.menuItemId)!;
+      const customizations: OrderItemCustomization[] = Array.from(line.selectedCustomizations.entries()).map(([id, data]) => {
+        const customization = menuItem.customizations?.find(c => c.id === id);
+        return {
+          customizationId: id,
+          customizationName: customization?.name || '',
+          optionName: data.optionName,
+          price: data.price,
+        };
+      });
+
+      let itemPrice = menuItem.price;
+      customizations.forEach(c => itemPrice += c.price);
+
       return {
         menuItemId: menuItem.id,
         name: menuItem.name,
         quantity: line.quantity,
-        price: menuItem.price,
+        price: itemPrice,
+        customizations: customizations.length > 0 ? customizations : undefined,
       };
     });
 
-    addOrder({
-      branchId,
-      branchName: 'Staff Order',
-      guestName: guestName || 'Walk-in Customer',
-      guestPhone: guestPhone || 'N/A',
-      tableNumber: selectedTable,
-      items,
-      notes,
-    });
+    const lineTotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    toast({
-      title: 'Order Created',
-      description: `Manual order created for Table ${selectedTable}`,
-    });
+    // Check if there's an active order for this table
+    const existingOrder = getActiveOrderByTable(branchId, selectedTable);
+
+    if (existingOrder) {
+      // Add as a new order line to the existing order
+      addOrderLine(existingOrder.id, {
+        items,
+        total: lineTotal,
+        notes,
+      });
+
+      toast({
+        title: 'Order Line Added',
+        description: `New items added to Table ${selectedTable}'s order`,
+      });
+    } else {
+      // Create a new order with the first order line
+      addOrder({
+        branchId,
+        branchName: 'Staff Order',
+        guestName: guestName || 'Walk-in Customer',
+        guestPhone: guestPhone || 'N/A',
+        tableNumber: selectedTable,
+        orderLines: [{
+          id: '', // Will be generated
+          items,
+          total: lineTotal,
+          createdAt: '', // Will be generated
+          notes,
+        }],
+      });
+
+      toast({
+        title: 'Order Created',
+        description: `New order created for Table ${selectedTable}`,
+      });
+    }
 
     // Reset form
     setSelectedTable('');
-    setOrderLines([{ menuItemId: '', quantity: 1 }]);
+    setOrderLines([{ menuItemId: '', quantity: 1, selectedCustomizations: new Map() }]);
     setGuestName('');
     setGuestPhone('');
     setNotes('');
@@ -105,9 +200,9 @@ export const ManualOrderDialog = ({ open, onOpenChange, branchId }: ManualOrderD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Manual Order</DialogTitle>
+          <DialogTitle>Create Order / Add Order Line</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -156,48 +251,106 @@ export const ManualOrderDialog = ({ open, onOpenChange, branchId }: ManualOrderD
               </Button>
             </div>
 
-            <div className="space-y-3">
-              {orderLines.map((line, index) => (
-                <div key={index} className="flex gap-2 items-end">
-                  <div className="flex-1 space-y-2">
-                    <Select
-                      value={line.menuItemId}
-                      onValueChange={(value) => handleOrderLineChange(index, 'menuItemId', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select menu item" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {menuItems.map(item => (
-                          <SelectItem key={item.id} value={item.id}>
-                            {item.name} - ${item.price.toFixed(2)}
-                          </SelectItem>
+            <div className="space-y-4">
+              {orderLines.map((line, index) => {
+                const menuItem = menuItems.find(m => m.id === line.menuItemId);
+                const lineTotal = calculateLineTotal(line);
+
+                return (
+                  <div key={index} className="p-4 border rounded-lg space-y-3">
+                    <div className="flex gap-2 items-end">
+                      <div className="flex-1 space-y-2">
+                        <Select
+                          value={line.menuItemId}
+                          onValueChange={(value) => handleOrderLineChange(index, 'menuItemId', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select menu item" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {menuItems.map(item => (
+                              <SelectItem key={item.id} value={item.id}>
+                                {item.name} - ${item.price.toFixed(2)}
+                                {item.category && <Badge variant="outline" className="ml-2">{item.category}</Badge>}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="w-24 space-y-2">
+                        <Input
+                          type="number"
+                          min="1"
+                          value={line.quantity}
+                          onChange={(e) => handleOrderLineChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                          placeholder="Qty"
+                        />
+                      </div>
+
+                      {orderLines.length > 1 && (
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => handleRemoveOrderLine(index)}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+
+                    {menuItem && menuItem.customizations && menuItem.customizations.length > 0 && (
+                      <div className="space-y-3 pl-2 border-l-2 border-primary/20">
+                        <p className="text-sm font-semibold text-muted-foreground">Customizations:</p>
+                        {menuItem.customizations.map(customization => (
+                          <div key={customization.id} className="space-y-2">
+                            <Label className="text-sm">{customization.name}</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              {customization.options.map(option => {
+                                const isSelected = line.selectedCustomizations.has(customization.id) && 
+                                  line.selectedCustomizations.get(customization.id)?.optionName === option.name;
+                                
+                                return (
+                                  <div key={option.name} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`${index}-${customization.id}-${option.name}`}
+                                      checked={isSelected}
+                                      onCheckedChange={(checked) => 
+                                        handleCustomizationChange(
+                                          index, 
+                                          customization.id, 
+                                          customization.name,
+                                          option.name, 
+                                          option.price, 
+                                          checked as boolean
+                                        )
+                                      }
+                                    />
+                                    <label
+                                      htmlFor={`${index}-${customization.id}-${option.name}`}
+                                      className="text-sm cursor-pointer"
+                                    >
+                                      {option.name} {option.price > 0 && `(+$${option.price.toFixed(2)})`}
+                                    </label>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                      </div>
+                    )}
 
-                  <div className="w-24 space-y-2">
-                    <Input
-                      type="number"
-                      min="1"
-                      value={line.quantity}
-                      onChange={(e) => handleOrderLineChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                      placeholder="Qty"
-                    />
+                    {menuItem && (
+                      <div className="flex justify-end pt-2 border-t">
+                        <span className="text-sm font-semibold">
+                          Line Total: ${lineTotal.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
                   </div>
-
-                  {orderLines.length > 1 && (
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleRemoveOrderLine(index)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -211,13 +364,18 @@ export const ManualOrderDialog = ({ open, onOpenChange, branchId }: ManualOrderD
             />
           </div>
 
-          <div className="flex gap-2 pt-4">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} className="flex-1">
-              Create Order
-            </Button>
+          <div className="flex justify-between items-center pt-4 border-t">
+            <div className="text-lg font-bold">
+              Total: ${calculateTotal().toFixed(2)}
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSubmit}>
+                Create Order
+              </Button>
+            </div>
           </div>
         </div>
       </DialogContent>

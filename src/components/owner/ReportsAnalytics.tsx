@@ -20,12 +20,14 @@ export const ReportsAnalytics = ({ branchId }: ReportsAnalyticsProps) => {
     const itemSales: { [key: string]: { name: string; revenue: number; quantity: number } } = {};
 
     branchOrders.forEach(order => {
-      order.items.forEach(item => {
-        if (!itemSales[item.name]) {
-          itemSales[item.name] = { name: item.name, revenue: 0, quantity: 0 };
-        }
-        itemSales[item.name].revenue += item.price * item.quantity;
-        itemSales[item.name].quantity += item.quantity;
+      order.orderLines.forEach(line => {
+        line.items.forEach(item => {
+          if (!itemSales[item.name]) {
+            itemSales[item.name] = { name: item.name, revenue: 0, quantity: 0 };
+          }
+          itemSales[item.name].revenue += item.price * item.quantity;
+          itemSales[item.name].quantity += item.quantity;
+        });
       });
     });
 

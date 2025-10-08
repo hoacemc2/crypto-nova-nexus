@@ -25,12 +25,14 @@ export const BillCreationDialog = ({
   const totalAmount = selectedOrders.reduce((sum, order) => sum + order.total, 0);
 
   const allItems = selectedOrders.flatMap(order => 
-    order.items.map(item => ({
-      name: item.name,
-      quantity: item.quantity,
-      price: item.price,
-      total: item.price * item.quantity,
-    }))
+    order.orderLines.flatMap(line =>
+      line.items.map(item => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.price * item.quantity,
+      }))
+    )
   );
 
   const handleCreateBill = () => {

@@ -121,22 +121,28 @@ export const TableDetailsDialog = ({ tableId, branchId, open, onOpenChange }: Ta
                           <p className="font-bold text-lg">${order.total.toFixed(2)}</p>
                         </div>
 
-                        <div className="space-y-2">
-                          {order.items.map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-sm">
-                              <span>{item.quantity}x {item.name}</span>
-                              <span className="text-muted-foreground">
-                                ${(item.price * item.quantity).toFixed(2)}
-                              </span>
+                        <div className="space-y-3">
+                          {order.orderLines.map((line, lineIdx) => (
+                            <div key={line.id} className="space-y-2 p-2 bg-muted/30 rounded">
+                              <div className="text-xs text-muted-foreground">
+                                Line {lineIdx + 1} - {new Date(line.createdAt).toLocaleTimeString()}
+                              </div>
+                              {line.items.map((item, idx) => (
+                                <div key={idx} className="flex justify-between text-sm">
+                                  <span>{item.quantity}x {item.name}</span>
+                                  <span className="text-muted-foreground">
+                                    ${(item.price * item.quantity).toFixed(2)}
+                                  </span>
+                                </div>
+                              ))}
+                              {line.notes && (
+                                <p className="text-xs text-muted-foreground italic">
+                                  Note: {line.notes}
+                                </p>
+                              )}
                             </div>
                           ))}
                         </div>
-
-                        {order.notes && (
-                          <p className="text-sm text-muted-foreground mt-3 italic">
-                            Note: {order.notes}
-                          </p>
-                        )}
                       </CardContent>
                     </Card>
                   ))}
@@ -181,13 +187,20 @@ export const TableDetailsDialog = ({ tableId, branchId, open, onOpenChange }: Ta
                         <p className="font-bold text-lg">${order.total.toFixed(2)}</p>
                       </div>
 
-                      <div className="space-y-2">
-                        {order.items.map((item, idx) => (
-                          <div key={idx} className="flex justify-between text-sm">
-                            <span>{item.quantity}x {item.name}</span>
-                            <span className="text-muted-foreground">
-                              ${(item.price * item.quantity).toFixed(2)}
-                            </span>
+                      <div className="space-y-3">
+                        {order.orderLines.map((line, lineIdx) => (
+                          <div key={line.id} className="space-y-2 p-2 bg-muted/30 rounded">
+                            <div className="text-xs text-muted-foreground">
+                              Line {lineIdx + 1} - {new Date(line.createdAt).toLocaleTimeString()}
+                            </div>
+                            {line.items.map((item, idx) => (
+                              <div key={idx} className="flex justify-between text-sm">
+                                <span>{item.quantity}x {item.name}</span>
+                                <span className="text-muted-foreground">
+                                  ${(item.price * item.quantity).toFixed(2)}
+                                </span>
+                              </div>
+                            ))}
                           </div>
                         ))}
                       </div>

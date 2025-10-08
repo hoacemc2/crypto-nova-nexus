@@ -42,13 +42,20 @@ export function OrderDialog({ branchId, branchName, selectedItems, onOrderComple
   const total = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const onSubmit = (data: OrderFormData) => {
+    const lineTotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    
     addOrder({
       branchId,
       branchName,
       guestName: data.guestName,
       guestPhone: data.guestPhone,
-      items: selectedItems,
-      notes: data.notes,
+      orderLines: [{
+        id: '', // Will be generated
+        items: selectedItems,
+        total: lineTotal,
+        createdAt: '', // Will be generated
+        notes: data.notes,
+      }],
     });
 
     toast({
