@@ -35,6 +35,26 @@ export const mockMenuItems = [
     imageUrl: '/placeholder.svg',
     available: true,
     bestSeller: true,
+    customizations: [
+      {
+        id: 'burger-cheese',
+        name: 'Extra Cheese',
+        options: [
+          { name: 'Cheddar', price: 1.50 },
+          { name: 'Swiss', price: 1.50 },
+          { name: 'Blue Cheese', price: 2.00 },
+        ],
+      },
+      {
+        id: 'burger-extras',
+        name: 'Add-ons',
+        options: [
+          { name: 'Bacon', price: 2.50 },
+          { name: 'Avocado', price: 2.00 },
+          { name: 'Fried Egg', price: 1.50 },
+        ],
+      },
+    ],
   },
   {
     id: '4',
@@ -79,6 +99,96 @@ export const mockMenuItems = [
     imageUrl: '/placeholder.svg',
     available: true,
     bestSeller: false,
+  },
+  {
+    id: '8',
+    branchId: '1',
+    name: 'Classic Milk Tea',
+    description: 'Traditional milk tea with black tea base',
+    price: 5.99,
+    category: 'Milk Tea',
+    imageUrl: '/placeholder.svg',
+    available: true,
+    bestSeller: true,
+    customizations: [
+      {
+        id: 'milk-tea-sweetness',
+        name: 'Sweetness Level',
+        options: [
+          { name: '0%', price: 0 },
+          { name: '25%', price: 0 },
+          { name: '50%', price: 0 },
+          { name: '75%', price: 0 },
+          { name: '100%', price: 0 },
+        ],
+      },
+      {
+        id: 'milk-tea-toppings',
+        name: 'Add Toppings',
+        options: [
+          { name: 'Pearls (Boba)', price: 0.75 },
+          { name: 'Pudding', price: 0.75 },
+          { name: 'Jelly', price: 0.75 },
+          { name: 'Red Bean', price: 1.00 },
+          { name: 'Grass Jelly', price: 0.75 },
+        ],
+      },
+      {
+        id: 'milk-tea-ice',
+        name: 'Ice Level',
+        options: [
+          { name: 'No Ice', price: 0 },
+          { name: 'Less Ice', price: 0 },
+          { name: 'Regular Ice', price: 0 },
+          { name: 'Extra Ice', price: 0 },
+        ],
+      },
+    ],
+  },
+  {
+    id: '9',
+    branchId: '1',
+    name: 'Taro Milk Tea',
+    description: 'Creamy taro-flavored milk tea',
+    price: 6.49,
+    category: 'Milk Tea',
+    imageUrl: '/placeholder.svg',
+    available: true,
+    bestSeller: true,
+    customizations: [
+      {
+        id: 'milk-tea-sweetness',
+        name: 'Sweetness Level',
+        options: [
+          { name: '0%', price: 0 },
+          { name: '25%', price: 0 },
+          { name: '50%', price: 0 },
+          { name: '75%', price: 0 },
+          { name: '100%', price: 0 },
+        ],
+      },
+      {
+        id: 'milk-tea-toppings',
+        name: 'Add Toppings',
+        options: [
+          { name: 'Pearls (Boba)', price: 0.75 },
+          { name: 'Pudding', price: 0.75 },
+          { name: 'Jelly', price: 0.75 },
+          { name: 'Red Bean', price: 1.00 },
+          { name: 'Grass Jelly', price: 0.75 },
+        ],
+      },
+      {
+        id: 'milk-tea-ice',
+        name: 'Ice Level',
+        options: [
+          { name: 'No Ice', price: 0 },
+          { name: 'Less Ice', price: 0 },
+          { name: 'Regular Ice', price: 0 },
+          { name: 'Extra Ice', price: 0 },
+        ],
+      },
+    ],
   },
   // Westside Branch (id: '2') menu - slightly different
   {
