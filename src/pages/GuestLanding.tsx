@@ -144,14 +144,32 @@ const GuestLanding = () => {
 
   // Apply custom color theme if set
   const colorTheme = branch?.colorTheme;
-  const customColors = branch?.primaryColor ? {
-    '--primary': branch.primaryColor,
-    '--accent': branch.accentColor || '43 74% 66%',
-    '--background': branch.backgroundColor || '0 0% 100%',
+  const customColors = branch?.heroBackground ? {
+    '--hero-bg': branch.heroBackground,
+    '--hero-text': branch.heroText,
+    '--hero-accent': branch.heroAccent,
+    '--card-bg': branch.cardBackground,
+    '--card-border': branch.cardBorder,
+    '--btn-primary': branch.buttonPrimary,
+    '--btn-primary-text': branch.buttonPrimaryText,
+    '--btn-secondary': branch.buttonSecondary,
+    '--btn-secondary-text': branch.buttonSecondaryText,
+    '--heading-color': branch.headingColor,
+    '--body-text': branch.bodyTextColor,
+    '--page-bg': branch.pageBackground,
   } : colorTheme ? {
-    '--primary': getThemeColors(colorTheme).primary,
-    '--secondary': getThemeColors(colorTheme).secondary,
-    '--accent': getThemeColors(colorTheme).accent,
+    '--hero-bg': getThemeColors(colorTheme).primary,
+    '--hero-text': '0 0% 100%',
+    '--hero-accent': getThemeColors(colorTheme).accent,
+    '--card-bg': '0 0% 100%',
+    '--card-border': '240 5% 90%',
+    '--btn-primary': getThemeColors(colorTheme).accent,
+    '--btn-primary-text': '240 5% 15%',
+    '--btn-secondary': getThemeColors(colorTheme).secondary,
+    '--btn-secondary-text': '0 0% 100%',
+    '--heading-color': '240 5% 15%',
+    '--body-text': '240 5% 40%',
+    '--page-bg': '0 0% 98%',
   } : {};
   
   const themeStyles = {
@@ -159,7 +177,7 @@ const GuestLanding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background" {...themeStyles}>
+    <div className="min-h-screen" style={{ backgroundColor: `hsl(var(--page-bg, 0 0% 98%))`, ...customColors }}>
       {/* Floating Cart Button */}
       {totalItems > 0 && (
         <div className="fixed bottom-6 right-6 z-50 w-[400px]">
@@ -193,7 +211,12 @@ const GuestLanding = () => {
 
       {/* Hero Section */}
       <div 
-        className="relative min-h-[500px] bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center overflow-hidden"
+        className="relative min-h-[500px] flex items-center justify-center overflow-hidden"
+        style={{ 
+          background: branch.bannerUrl 
+            ? 'transparent' 
+            : `linear-gradient(135deg, hsl(var(--hero-bg, 240 5% 15%)), hsl(var(--hero-accent, 43 74% 66%)) 100%)`
+        }}
       >
         {branch.bannerUrl && (
           <>
@@ -214,16 +237,32 @@ const GuestLanding = () => {
               />
             </div>
           )}
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+          <h1 
+            className="text-5xl md:text-6xl font-bold mb-4"
+            style={{ 
+              color: `hsl(var(--hero-text, 0 0% 100%))`,
+              textShadow: '0 2px 10px rgba(0,0,0,0.1)'
+            }}
+          >
             {branch.brandName}
           </h1>
           {tableNumber && (
             <Badge className="mb-4 text-lg px-6 py-2 shadow-soft">Table {tableNumber}</Badge>
           )}
           {branch.tagline && (
-            <p className="text-2xl md:text-3xl font-medium mb-4 text-foreground/90">{branch.tagline}</p>
+            <p 
+              className="text-2xl md:text-3xl font-medium mb-4"
+              style={{ color: `hsl(var(--hero-text, 0 0% 100%))` }}
+            >
+              {branch.tagline}
+            </p>
           )}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">{branch.description}</p>
+          <p 
+            className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed opacity-90"
+            style={{ color: `hsl(var(--hero-text, 0 0% 100%))` }}
+          >
+            {branch.description}
+          </p>
         </div>
       </div>
 
@@ -272,15 +311,30 @@ const GuestLanding = () => {
         <div className="space-y-8">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-3xl font-bold">Our Menu</h2>
-              <p className="text-muted-foreground mt-1">Browse our delicious offerings</p>
+              <h2 
+                className="text-3xl font-bold"
+                style={{ color: `hsl(var(--heading-color, 240 5% 15%))` }}
+              >
+                Our Menu
+              </h2>
+              <p 
+                className="mt-1"
+                style={{ color: `hsl(var(--body-text, 240 5% 40%))` }}
+              >
+                Browse our delicious offerings
+              </p>
             </div>
           </div>
 
           {menuCategories.map(category => (
             <div key={category} className="space-y-4">
               <div className="flex items-center gap-3">
-                <h3 className="text-2xl font-semibold">{category}</h3>
+                <h3 
+                  className="text-2xl font-semibold"
+                  style={{ color: `hsl(var(--heading-color, 240 5% 15%))` }}
+                >
+                  {category}
+                </h3>
                 <Separator className="flex-1" />
               </div>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -289,7 +343,14 @@ const GuestLanding = () => {
                   .map(item => {
                     const itemQuantity = getItemQuantity(item.id);
                     return (
-                      <Card key={item.id} className="overflow-hidden hover:shadow-medium transition-smooth">
+                      <Card 
+                        key={item.id} 
+                        className="overflow-hidden hover:shadow-medium transition-smooth"
+                        style={{
+                          backgroundColor: `hsl(var(--card-bg, 0 0% 100%))`,
+                          borderColor: `hsl(var(--card-border, 240 5% 90%))`
+                        }}
+                      >
                         <div className="aspect-video bg-muted relative">
                           <img 
                             src={item.imageUrl} 
@@ -309,10 +370,16 @@ const GuestLanding = () => {
                         </div>
                         <CardHeader>
                           <CardTitle className="flex items-start justify-between">
-                            <span>{item.name}</span>
-                            <span className="text-primary">${item.price}</span>
+                            <span style={{ color: `hsl(var(--heading-color, 240 5% 15%))` }}>
+                              {item.name}
+                            </span>
+                            <span style={{ color: `hsl(var(--hero-accent, 43 74% 66%))` }}>
+                              ${item.price}
+                            </span>
                           </CardTitle>
-                          <CardDescription>{item.description}</CardDescription>
+                          <CardDescription style={{ color: `hsl(var(--body-text, 240 5% 40%))` }}>
+                            {item.description}
+                          </CardDescription>
                         </CardHeader>
                         <CardContent>
                           {itemQuantity > 0 ? (
@@ -333,6 +400,10 @@ const GuestLanding = () => {
                                 onClick={() => updateQuantity(item.id, 1)}
                                 disabled={!item.available}
                                 className="h-10 w-10"
+                                style={{
+                                  backgroundColor: `hsl(var(--btn-primary, 43 74% 66%))`,
+                                  color: `hsl(var(--btn-primary-text, 240 5% 15%))`
+                                }}
                               >
                                 <Plus className="h-4 w-4" />
                               </Button>
@@ -342,6 +413,10 @@ const GuestLanding = () => {
                               className="w-full" 
                               onClick={() => addToCart(item)}
                               disabled={!item.available}
+                              style={{
+                                backgroundColor: `hsl(var(--btn-primary, 43 74% 66%))`,
+                                color: `hsl(var(--btn-primary-text, 240 5% 15%))`
+                              }}
                             >
                               <ShoppingCart className="mr-2 h-4 w-4" />
                               Add to Order

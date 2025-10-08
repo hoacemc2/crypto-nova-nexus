@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
 import { Eye, Copy, Save, Palette } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -19,9 +20,23 @@ export const BranchLandingCustomizer = ({ branch }: BranchLandingCustomizerProps
     email: branch.email || '',
     address: branch.address || '',
     tagline: branch.tagline || '',
-    primaryColor: branch.primaryColor || '240 5% 15%',
-    accentColor: branch.accentColor || '43 74% 66%',
-    backgroundColor: branch.backgroundColor || '0 0% 100%',
+    // Hero section colors
+    heroBackground: branch.heroBackground || '240 5% 15%',
+    heroText: branch.heroText || '0 0% 100%',
+    heroAccent: branch.heroAccent || '43 74% 66%',
+    // Card colors
+    cardBackground: branch.cardBackground || '0 0% 100%',
+    cardBorder: branch.cardBorder || '240 5% 90%',
+    // Button colors
+    buttonPrimary: branch.buttonPrimary || '43 74% 66%',
+    buttonPrimaryText: branch.buttonPrimaryText || '240 5% 15%',
+    buttonSecondary: branch.buttonSecondary || '240 5% 25%',
+    buttonSecondaryText: branch.buttonSecondaryText || '0 0% 100%',
+    // Text colors
+    headingColor: branch.headingColor || '240 5% 15%',
+    bodyTextColor: branch.bodyTextColor || '240 5% 40%',
+    // Page background
+    pageBackground: branch.pageBackground || '0 0% 98%',
   });
 
   const handleSave = () => {
@@ -193,69 +208,283 @@ export const BranchLandingCustomizer = ({ branch }: BranchLandingCustomizerProps
             Color Theme
           </CardTitle>
           <CardDescription>
-            Customize the colors for your landing page
+            Customize colors for specific elements on your landing page
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="primaryColor">Primary Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="primaryColor"
-                  type="color"
-                  value={hslToHex(landingData.primaryColor)}
-                  onChange={(e) => setLandingData({ ...landingData, primaryColor: hexToHsl(e.target.value) })}
-                  className="w-20 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={landingData.primaryColor}
-                  onChange={(e) => setLandingData({ ...landingData, primaryColor: e.target.value })}
-                  placeholder="240 5% 15%"
-                  className="flex-1"
-                />
+        <CardContent className="space-y-6">
+          {/* Hero Section Colors */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-sm">Hero Section</h4>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="heroBackground">Hero Background</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="heroBackground"
+                    type="color"
+                    value={hslToHex(landingData.heroBackground)}
+                    onChange={(e) => setLandingData({ ...landingData, heroBackground: hexToHsl(e.target.value) })}
+                    className="w-20 h-10 p-1 cursor-pointer"
+                  />
+                  <Input
+                    value={landingData.heroBackground}
+                    onChange={(e) => setLandingData({ ...landingData, heroBackground: e.target.value })}
+                    placeholder="240 5% 15%"
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Top banner area</p>
               </div>
-              <p className="text-xs text-muted-foreground">Main brand color</p>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="accentColor">Accent Color</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="accentColor"
-                  type="color"
-                  value={hslToHex(landingData.accentColor)}
-                  onChange={(e) => setLandingData({ ...landingData, accentColor: hexToHsl(e.target.value) })}
-                  className="w-20 h-10 p-1 cursor-pointer"
-                />
-                <Input
-                  value={landingData.accentColor}
-                  onChange={(e) => setLandingData({ ...landingData, accentColor: e.target.value })}
-                  placeholder="43 74% 66%"
-                  className="flex-1"
-                />
+              <div className="space-y-2">
+                <Label htmlFor="heroText">Hero Text</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="heroText"
+                    type="color"
+                    value={hslToHex(landingData.heroText)}
+                    onChange={(e) => setLandingData({ ...landingData, heroText: hexToHsl(e.target.value) })}
+                    className="w-20 h-10 p-1 cursor-pointer"
+                  />
+                  <Input
+                    value={landingData.heroText}
+                    onChange={(e) => setLandingData({ ...landingData, heroText: e.target.value })}
+                    placeholder="0 0% 100%"
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Restaurant name & tagline</p>
               </div>
-              <p className="text-xs text-muted-foreground">Buttons & highlights</p>
-            </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="heroAccent">Hero Accent</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="heroAccent"
+                    type="color"
+                    value={hslToHex(landingData.heroAccent)}
+                    onChange={(e) => setLandingData({ ...landingData, heroAccent: hexToHsl(e.target.value) })}
+                    className="w-20 h-10 p-1 cursor-pointer"
+                  />
+                  <Input
+                    value={landingData.heroAccent}
+                    onChange={(e) => setLandingData({ ...landingData, heroAccent: e.target.value })}
+                    placeholder="43 74% 66%"
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Highlights & gradient</p>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Card Colors */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-sm">Menu Cards</h4>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="cardBackground">Card Background</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="cardBackground"
+                    type="color"
+                    value={hslToHex(landingData.cardBackground)}
+                    onChange={(e) => setLandingData({ ...landingData, cardBackground: hexToHsl(e.target.value) })}
+                    className="w-20 h-10 p-1 cursor-pointer"
+                  />
+                  <Input
+                    value={landingData.cardBackground}
+                    onChange={(e) => setLandingData({ ...landingData, cardBackground: e.target.value })}
+                    placeholder="0 0% 100%"
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Menu item cards</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cardBorder">Card Border</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="cardBorder"
+                    type="color"
+                    value={hslToHex(landingData.cardBorder)}
+                    onChange={(e) => setLandingData({ ...landingData, cardBorder: hexToHsl(e.target.value) })}
+                    className="w-20 h-10 p-1 cursor-pointer"
+                  />
+                  <Input
+                    value={landingData.cardBorder}
+                    onChange={(e) => setLandingData({ ...landingData, cardBorder: e.target.value })}
+                    placeholder="240 5% 90%"
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Card outline color</p>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Button Colors */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-sm">Buttons</h4>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <p className="text-sm font-medium">Primary Button</p>
+                <div className="space-y-2">
+                  <Label htmlFor="buttonPrimary">Background</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="buttonPrimary"
+                      type="color"
+                      value={hslToHex(landingData.buttonPrimary)}
+                      onChange={(e) => setLandingData({ ...landingData, buttonPrimary: hexToHsl(e.target.value) })}
+                      className="w-20 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={landingData.buttonPrimary}
+                      onChange={(e) => setLandingData({ ...landingData, buttonPrimary: e.target.value })}
+                      placeholder="43 74% 66%"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="buttonPrimaryText">Text Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="buttonPrimaryText"
+                      type="color"
+                      value={hslToHex(landingData.buttonPrimaryText)}
+                      onChange={(e) => setLandingData({ ...landingData, buttonPrimaryText: hexToHsl(e.target.value) })}
+                      className="w-20 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={landingData.buttonPrimaryText}
+                      onChange={(e) => setLandingData({ ...landingData, buttonPrimaryText: e.target.value })}
+                      placeholder="240 5% 15%"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-sm font-medium">Secondary Button</p>
+                <div className="space-y-2">
+                  <Label htmlFor="buttonSecondary">Background</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="buttonSecondary"
+                      type="color"
+                      value={hslToHex(landingData.buttonSecondary)}
+                      onChange={(e) => setLandingData({ ...landingData, buttonSecondary: hexToHsl(e.target.value) })}
+                      className="w-20 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={landingData.buttonSecondary}
+                      onChange={(e) => setLandingData({ ...landingData, buttonSecondary: e.target.value })}
+                      placeholder="240 5% 25%"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="buttonSecondaryText">Text Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="buttonSecondaryText"
+                      type="color"
+                      value={hslToHex(landingData.buttonSecondaryText)}
+                      onChange={(e) => setLandingData({ ...landingData, buttonSecondaryText: hexToHsl(e.target.value) })}
+                      className="w-20 h-10 p-1 cursor-pointer"
+                    />
+                    <Input
+                      value={landingData.buttonSecondaryText}
+                      onChange={(e) => setLandingData({ ...landingData, buttonSecondaryText: e.target.value })}
+                      placeholder="0 0% 100%"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Text Colors */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-sm">Typography</h4>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="headingColor">Heading Color</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="headingColor"
+                    type="color"
+                    value={hslToHex(landingData.headingColor)}
+                    onChange={(e) => setLandingData({ ...landingData, headingColor: hexToHsl(e.target.value) })}
+                    className="w-20 h-10 p-1 cursor-pointer"
+                  />
+                  <Input
+                    value={landingData.headingColor}
+                    onChange={(e) => setLandingData({ ...landingData, headingColor: e.target.value })}
+                    placeholder="240 5% 15%"
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Menu titles & headings</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bodyTextColor">Body Text</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="bodyTextColor"
+                    type="color"
+                    value={hslToHex(landingData.bodyTextColor)}
+                    onChange={(e) => setLandingData({ ...landingData, bodyTextColor: hexToHsl(e.target.value) })}
+                    className="w-20 h-10 p-1 cursor-pointer"
+                  />
+                  <Input
+                    value={landingData.bodyTextColor}
+                    onChange={(e) => setLandingData({ ...landingData, bodyTextColor: e.target.value })}
+                    placeholder="240 5% 40%"
+                    className="flex-1"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Descriptions & content</p>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Page Background */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-sm">Page Background</h4>
             <div className="space-y-2">
-              <Label htmlFor="backgroundColor">Background Color</Label>
+              <Label htmlFor="pageBackground">Background Color</Label>
               <div className="flex gap-2">
                 <Input
-                  id="backgroundColor"
+                  id="pageBackground"
                   type="color"
-                  value={hslToHex(landingData.backgroundColor)}
-                  onChange={(e) => setLandingData({ ...landingData, backgroundColor: hexToHsl(e.target.value) })}
+                  value={hslToHex(landingData.pageBackground)}
+                  onChange={(e) => setLandingData({ ...landingData, pageBackground: hexToHsl(e.target.value) })}
                   className="w-20 h-10 p-1 cursor-pointer"
                 />
                 <Input
-                  value={landingData.backgroundColor}
-                  onChange={(e) => setLandingData({ ...landingData, backgroundColor: e.target.value })}
-                  placeholder="0 0% 100%"
+                  value={landingData.pageBackground}
+                  onChange={(e) => setLandingData({ ...landingData, pageBackground: e.target.value })}
+                  placeholder="0 0% 98%"
                   className="flex-1"
                 />
               </div>
-              <p className="text-xs text-muted-foreground">Page background</p>
+              <p className="text-xs text-muted-foreground">Overall page background</p>
             </div>
           </div>
         </CardContent>

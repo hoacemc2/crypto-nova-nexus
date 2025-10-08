@@ -1,5 +1,5 @@
-import { BranchCustomization } from '@/components/owner/BranchCustomization';
-import { BranchLandingCustomizer } from '@/components/owner/BranchLandingCustomizer';
+import { BranchCustomization } from '@/components/owner/BranchThemeEditor';
+import { BranchLandingCustomizer } from '@/components/owner/BranchLandingEditor';
 
 const CustomizationPage = () => {
   // Get active branch from localStorage
