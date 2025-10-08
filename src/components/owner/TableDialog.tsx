@@ -20,7 +20,7 @@ const tableSchema = z.object({
   number: z.coerce.number().min(1, 'Table number must be at least 1'),
   capacity: z.coerce.number().min(1, 'Capacity must be at least 1'),
   floor: z.coerce.number().min(1, 'Floor must be at least 1'),
-  status: z.enum(['available', 'occupied', 'reserved']),
+  status: z.enum(['available', 'occupied', 'out_of_service']),
 });
 
 type TableFormData = z.infer<typeof tableSchema>;
@@ -137,7 +137,7 @@ export const TableDialog = ({ open, onOpenChange, branchId, table }: TableDialog
               <SelectContent>
                 <SelectItem value="available">Available</SelectItem>
                 <SelectItem value="occupied">Occupied</SelectItem>
-                <SelectItem value="reserved">Reserved</SelectItem>
+                <SelectItem value="out_of_service">Out of Service</SelectItem>
               </SelectContent>
             </Select>
             {errors.status && (

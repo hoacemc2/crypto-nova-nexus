@@ -2,10 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, Mail, Phone, Eye } from 'lucide-react';
+import { Users, Mail, Phone, Eye, Plus } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { StaffViewDialog } from '@/components/manager/StaffViewDialog';
+import { StaffManagementDialog } from '@/components/manager/StaffManagementDialog';
 
 interface Staff {
   id: string;
@@ -24,6 +25,8 @@ export default function StaffPage() {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [selectedStaff, setSelectedStaff] = useState<Staff[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [addStaffDialogOpen, setAddStaffDialogOpen] = useState(false);
+  const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
   const { user } = useAuthStore();
 
   useEffect(() => {
@@ -61,6 +64,17 @@ export default function StaffPage() {
     setDialogOpen(true);
   };
 
+  const handleAddStaff = () => {
+    setEditingStaff(null);
+    setAddStaffDialogOpen(true);
+  };
+
+  const handleStaffSaved = () => {
+    loadStaff();
+    setAddStaffDialogOpen(false);
+    setEditingStaff(null);
+  };
+
   const staffByRole = staff.reduce((acc, member) => {
     acc[member.role] = (acc[member.role] || 0) + 1;
     return acc;
@@ -71,12 +85,18 @@ export default function StaffPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold">Staff Management</h2>
-          <p className="text-muted-foreground">View staff members in your branch</p>
+          <p className="text-muted-foreground">Manage staff members in your branch</p>
         </div>
-        <Button onClick={handleViewAll}>
-          <Eye className="mr-2 h-4 w-4" />
-          View All Staff
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleViewAll}>
+            <Eye className="mr-2 h-4 w-4" />
+            View All
+          </Button>
+          <Button onClick={handleAddStaff}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Staff
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -177,6 +197,14 @@ export default function StaffPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         staff={selectedStaff}
+      />
+
+      <StaffManagementDialog
+        open={addStaffDialogOpen}
+        onOpenChange={setAddStaffDialogOpen}
+        staff={editingStaff}
+        branchId={user?.branchId || ''}
+        onSuccess={handleStaffSaved}
       />
     </div>
   );

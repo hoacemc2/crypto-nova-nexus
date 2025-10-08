@@ -39,7 +39,8 @@ export const TableStatusDialog = ({ tableId, open, onOpenChange }: TableStatusDi
   const handleSave = () => {
     const updates: Partial<typeof table> = { status };
 
-    if (status === 'reserved' && reservationDate && startTime && endTime) {
+    if (status === 'occupied' && reservationDate && startTime && endTime && reservationName) {
+      // Save reservation details if table is occupied with a reservation
       const start = new Date(reservationDate);
       const [startHour, startMin] = startTime.split(':').map(Number);
       start.setHours(startHour, startMin);
@@ -51,7 +52,8 @@ export const TableStatusDialog = ({ tableId, open, onOpenChange }: TableStatusDi
       updates.reservationStart = start.toISOString();
       updates.reservationEnd = end.toISOString();
       updates.reservationName = reservationName;
-    } else if (status !== 'reserved') {
+    } else if (status === 'available' || status === 'out_of_service') {
+      // Clear reservation data when not occupied
       updates.reservationStart = undefined;
       updates.reservationEnd = undefined;
       updates.reservationName = undefined;
@@ -88,19 +90,13 @@ export const TableStatusDialog = ({ tableId, open, onOpenChange }: TableStatusDi
                   Occupied
                 </Label>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="reserved" id="reserved" />
-                <Label htmlFor="reserved" className="font-normal cursor-pointer">
-                  Reserved
-                </Label>
-              </div>
             </RadioGroup>
           </div>
 
-          {status === 'reserved' && (
+          {status === 'occupied' && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="reservationName">Reservation Name</Label>
+                <Label htmlFor="reservationName">Guest/Reservation Name (Optional)</Label>
                 <Input
                   id="reservationName"
                   value={reservationName}

@@ -16,7 +16,7 @@ const TablesPage = () => {
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
 
-  const branchTables = tables.filter(t => t.branchId === branchId);
+  const branchTables = tables.filter(t => t.branchId === branchId && t.status !== 'out_of_service');
 
   const handleViewDetails = (tableId: string) => {
     setSelectedTable(tableId);
@@ -34,8 +34,6 @@ const TablesPage = () => {
         return 'default';
       case 'occupied':
         return 'destructive';
-      case 'reserved':
-        return 'secondary';
       default:
         return 'outline';
     }
@@ -73,16 +71,14 @@ const TablesPage = () => {
                 </div>
               )}
 
-              {table.status === 'reserved' && table.reservationName && (
+              {table.reservationName && table.reservationStart && (
                 <div className="space-y-2 p-3 bg-muted rounded-lg">
                   <div className="text-sm font-semibold">
-                    Reserved for {table.reservationName}
+                    Reservation: {table.reservationName}
                   </div>
-                  {table.reservationStart && (
-                    <div className="text-sm text-muted-foreground">
-                      {new Date(table.reservationStart).toLocaleString()}
-                    </div>
-                  )}
+                  <div className="text-sm text-muted-foreground">
+                    {new Date(table.reservationStart).toLocaleString()}
+                  </div>
                 </div>
               )}
 

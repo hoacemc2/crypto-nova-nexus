@@ -23,7 +23,7 @@ export const AreaFloorManagement = () => {
         return 'default';
       case 'occupied':
         return 'destructive';
-      case 'reserved':
+      case 'out_of_service':
         return 'secondary';
       default:
         return 'default';
@@ -31,22 +31,19 @@ export const AreaFloorManagement = () => {
   };
 
   const getStatusLabel = (status: TableStatus) => {
-    return status.charAt(0).toUpperCase() + status.slice(1);
-  };
-
-  const isReservationSoon = (table: typeof tables[0]) => {
-    if (!table.reservationStart) return false;
-    const now = new Date();
-    const reservationStart = new Date(table.reservationStart);
-    const thirtyMinutesFromNow = addMinutes(now, 30);
-    return isWithinInterval(reservationStart, { start: now, end: thirtyMinutesFromNow });
+    switch (status) {
+      case 'out_of_service':
+        return 'Out of Service';
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
+    }
   };
 
   const canSeatCustomer = (table: typeof tables[0]) => {
-    if (table.status !== 'available' && table.status !== 'reserved') return false;
-    if (table.status === 'reserved' && isReservationSoon(table)) return false;
-    return true;
-  }; 
+    // Only available tables can seat customers
+    // Out of service tables should not be shown
+    return table.status === 'available';
+  };
 
   if (!branchId) {
     return (
@@ -72,9 +69,10 @@ export const AreaFloorManagement = () => {
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-              {tables.map((table) => {
+              {tables
+                .filter(table => table.status !== 'out_of_service')
+                .map((table) => {
                 const canSeat = canSeatCustomer(table);
-                const reservationWarning = table.status === 'reserved' && isReservationSoon(table);
                 
                 return (
                   <Card 
@@ -106,22 +104,12 @@ export const AreaFloorManagement = () => {
                           {getStatusLabel(table.status)}
                         </Badge>
 
-                        {table.status === 'reserved' && table.reservationStart && (
+                        {table.reservationStart && table.reservationName && (
                           <div className="text-xs text-muted-foreground space-y-1 w-full">
-                            <p className="font-medium">{table.reservationName}</p>
+                            <p className="font-medium">Reserved by:</p>
+                            <p>{table.reservationName}</p>
                             <p>{format(new Date(table.reservationStart), 'PPp')}</p>
-                            {reservationWarning && (
-                              <Badge variant="destructive" className="text-xs">
-                                Reservation Soon
-                              </Badge>
-                            )}
                           </div>
-                        )}
-
-                        {!canSeat && table.status === 'available' && (
-                          <Badge variant="secondary" className="text-xs">
-                            Available for Seating
-                          </Badge>
                         )}
                       </div>
                     </CardContent>

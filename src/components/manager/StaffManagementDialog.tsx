@@ -10,10 +10,12 @@ import { toast } from '@/hooks/use-toast';
 interface StaffManagementDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  staff?: any | null;
   branchId: string;
+  onSuccess?: () => void;
 }
 
-export const StaffManagementDialog = ({ open, onOpenChange, branchId }: StaffManagementDialogProps) => {
+export const StaffManagementDialog = ({ open, onOpenChange, staff, branchId, onSuccess }: StaffManagementDialogProps) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -62,6 +64,7 @@ export const StaffManagementDialog = ({ open, onOpenChange, branchId }: StaffMan
       password: '',
     });
 
+    onSuccess?.();
     onOpenChange(false);
   };
 

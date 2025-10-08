@@ -24,6 +24,8 @@ import ManagerBranchInfoPage from './pages/dashboard/manager/BranchInfoPage';
 import ManagerTablesPage from './pages/dashboard/manager/TablesPage';
 import ManagerStaffPage from './pages/dashboard/manager/StaffPage';
 import ManagerPromotionsPage from './pages/dashboard/manager/PromotionsPage';
+import ManagerBillsPage from './pages/dashboard/manager/BillsPage';
+import ManagerMenuPage from './pages/dashboard/manager/MenuPage';
 
 // Owner nested pages
 import OwnerOverviewPage from './pages/dashboard/owner/OverviewPage';
@@ -166,6 +168,14 @@ export const routes: RouteObject[] = [
       {
         path: 'promotions',
         element: <ManagerPromotionsPage />,
+      },
+      {
+        path: 'bills',
+        element: <ManagerBillsPage />,
+      },
+      {
+        path: 'menu',
+        element: <ManagerMenuPage />,
       },
     ],
   },

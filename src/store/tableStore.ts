@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type TableStatus = 'available' | 'occupied' | 'reserved';
+export type TableStatus = 'available' | 'occupied' | 'out_of_service';
 
 export interface Table {
   id: string;

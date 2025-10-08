@@ -41,7 +41,7 @@ export function TableAssignmentDialog({
   const handleAssignTable = () => {
     if (!selectedTableId) return;
 
-    updateTableStatus(selectedTableId, 'reserved');
+    updateTableStatus(selectedTableId, 'occupied');
     confirmBooking(bookingId);
     
     toast({

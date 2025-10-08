@@ -9,6 +9,8 @@ import {
   Building2,
   UtensilsCrossed,
   LogOut,
+  Receipt,
+  ChefHat,
 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -36,6 +38,20 @@ const menuItems = [
     icon: Table2,
     label: 'Tables',
     description: 'Table management'
+  },
+  { 
+    id: 'menu',
+    path: '/dashboard/manager/menu',
+    icon: ChefHat,
+    label: 'Menu',
+    description: 'Menu management'
+  },
+  { 
+    id: 'bills',
+    path: '/dashboard/manager/bills',
+    icon: Receipt,
+    label: 'Bills',
+    description: 'View bill history'
   },
   { 
     id: 'staff',

@@ -27,9 +27,9 @@ export const TableStatusView = ({ branchId }: TableStatusViewProps) => {
       case 'available':
         return 'bg-green-500';
       case 'occupied':
-        return 'bg-red-500';
-      case 'reserved':
-        return 'bg-yellow-500';
+        return 'bg-blue-500';
+      case 'out_of_service':
+        return 'bg-gray-500';
       default:
         return 'bg-gray-500';
     }
@@ -41,7 +41,7 @@ export const TableStatusView = ({ branchId }: TableStatusViewProps) => {
         return 'default';
       case 'occupied':
         return 'destructive';
-      case 'reserved':
+      case 'out_of_service':
         return 'secondary';
       default:
         return 'outline';
@@ -51,7 +51,7 @@ export const TableStatusView = ({ branchId }: TableStatusViewProps) => {
   const tablesByStatus = {
     available: tables.filter(t => t.status === 'available').length,
     occupied: tables.filter(t => t.status === 'occupied').length,
-    reserved: tables.filter(t => t.status === 'reserved').length,
+    out_of_service: tables.filter(t => t.status === 'out_of_service').length,
   };
 
   return (
@@ -71,7 +71,7 @@ export const TableStatusView = ({ branchId }: TableStatusViewProps) => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Occupied Tables</CardTitle>
-            <div className="h-3 w-3 rounded-full bg-red-500" />
+            <div className="h-3 w-3 rounded-full bg-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{tablesByStatus.occupied}</div>
@@ -81,12 +81,12 @@ export const TableStatusView = ({ branchId }: TableStatusViewProps) => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Reserved Tables</CardTitle>
-            <div className="h-3 w-3 rounded-full bg-yellow-500" />
+            <CardTitle className="text-sm font-medium">Out of Service</CardTitle>
+            <div className="h-3 w-3 rounded-full bg-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{tablesByStatus.reserved}</div>
-            <p className="text-xs text-muted-foreground">Upcoming reservations</p>
+            <div className="text-2xl font-bold">{tablesByStatus.out_of_service}</div>
+            <p className="text-xs text-muted-foreground">Under maintenance</p>
           </CardContent>
         </Card>
       </div>
