@@ -16,7 +16,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useNavigate } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface OwnerStaffManagementProps {
   branchId: string;
@@ -30,6 +38,8 @@ export const OwnerStaffManagement = ({ branchId }: OwnerStaffManagementProps) =>
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | undefined>();
   const [staffToDelete, setStaffToDelete] = useState<string | null>(null);
+  const [showBranchSelect, setShowBranchSelect] = useState(false);
+  const [selectedBranchForManager, setSelectedBranchForManager] = useState('');
 
   const handleEdit = (member: StaffMember) => {
     setSelectedStaff(member);
@@ -51,10 +61,34 @@ export const OwnerStaffManagement = ({ branchId }: OwnerStaffManagementProps) =>
   };
 
   const handleAccessManagerDashboard = () => {
+    setShowBranchSelect(true);
+  };
+
+  const handleBranchSelection = () => {
+    if (!selectedBranchForManager) {
+      toast({
+        variant: 'destructive',
+        title: 'Select a branch',
+        description: 'Please select a branch to continue.',
+      });
+      return;
+    }
+
     // Store that owner is accessing as manager
     sessionStorage.setItem('owner_viewing_as_manager', 'true');
+    sessionStorage.setItem('manager_branch_id', selectedBranchForManager);
+    
+    // Update user's branchId for manager view
+    const user = JSON.parse(localStorage.getItem('mock_auth_user') || '{}');
+    user.branchId = selectedBranchForManager;
+    localStorage.setItem('mock_auth_user', JSON.stringify(user));
+    
+    setShowBranchSelect(false);
     navigate('/dashboard/manager/overview');
   };
+
+  // Get all branches for selection
+  const allBranches = JSON.parse(localStorage.getItem('mock_branches') || '[]');
 
   return (
     <>
@@ -173,6 +207,44 @@ export const OwnerStaffManagement = ({ branchId }: OwnerStaffManagementProps) =>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={showBranchSelect} onOpenChange={setShowBranchSelect}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Select Branch</DialogTitle>
+            <DialogDescription>
+              Choose which branch to manage as a manager
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Branch</label>
+              <Select value={selectedBranchForManager} onValueChange={setSelectedBranchForManager}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a branch" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allBranches.map((branch: any) => (
+                    <SelectItem key={branch.id} value={branch.id}>
+                      {branch.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex gap-2 justify-end pt-4">
+              <Button variant="outline" onClick={() => setShowBranchSelect(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleBranchSelection}>
+                Continue to Manager Dashboard
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

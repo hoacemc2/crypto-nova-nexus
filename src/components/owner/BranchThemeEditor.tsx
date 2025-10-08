@@ -75,18 +75,41 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
   const [avatarPreview, setAvatarPreview] = useState(branch.logoUrl || '');
   const [bannerPreview, setBannerPreview] = useState(branch.bannerUrl || '');
 
+  const handleThemeChange = (themeId: string) => {
+    setSelectedTheme(themeId);
+    const theme = COLOR_THEMES.find(t => t.id === themeId);
+    if (theme) {
+      toast({
+        title: 'Theme Preview',
+        description: 'Colors will be applied when you save changes.',
+      });
+    }
+  };
+
   const handleSave = () => {
     const branches = JSON.parse(localStorage.getItem('mock_branches') || '[]');
+    const theme = COLOR_THEMES.find(t => t.id === selectedTheme);
+    
     const updatedBranches = branches.map((b: any) =>
       b.id === branch.id 
-        ? { ...b, logoUrl: avatarUrl, bannerUrl: bannerUrl, colorTheme: selectedTheme } 
+        ? { 
+            ...b, 
+            logoUrl: avatarUrl, 
+            bannerUrl: bannerUrl, 
+            colorTheme: selectedTheme,
+            // Apply theme colors to branch
+            heroBackground: theme?.colors.primary,
+            heroAccent: theme?.colors.accent,
+            buttonPrimary: theme?.colors.accent,
+            cardBorder: theme?.colors.secondary,
+          } 
         : b
     );
     localStorage.setItem('mock_branches', JSON.stringify(updatedBranches));
     
     toast({
       title: 'Customization Saved',
-      description: 'Branch appearance settings have been updated.',
+      description: 'Branch appearance settings and theme have been updated.',
     });
   };
 
@@ -221,7 +244,7 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
             {COLOR_THEMES.map((theme) => (
               <button
                 key={theme.id}
-                onClick={() => setSelectedTheme(theme.id)}
+                onClick={() => handleThemeChange(theme.id)}
                 className={`p-4 rounded-lg border-2 transition-all ${
                   selectedTheme === theme.id
                     ? 'border-primary shadow-lg'
@@ -239,16 +262,22 @@ export const BranchCustomization = ({ branch }: BranchCustomizationProps) => {
                     <div
                       className="h-12 flex-1 rounded"
                       style={{ backgroundColor: `hsl(${theme.colors.primary})` }}
+                      title="Primary"
                     />
                     <div
                       className="h-12 flex-1 rounded"
                       style={{ backgroundColor: `hsl(${theme.colors.secondary})` }}
+                      title="Secondary"
                     />
                     <div
                       className="h-12 flex-1 rounded"
                       style={{ backgroundColor: `hsl(${theme.colors.accent})` }}
+                      title="Accent"
                     />
                   </div>
+                  <p className="text-xs text-muted-foreground text-left">
+                    Applies to hero, buttons & accents
+                  </p>
                 </div>
               </button>
             ))}
