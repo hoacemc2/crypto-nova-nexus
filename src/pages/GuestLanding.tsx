@@ -144,13 +144,19 @@ const GuestLanding = () => {
 
   // Apply custom color theme if set
   const colorTheme = branch?.colorTheme;
-  const themeStyles = colorTheme ? {
-    style: {
-      '--primary': getThemeColors(colorTheme).primary,
-      '--secondary': getThemeColors(colorTheme).secondary,
-      '--accent': getThemeColors(colorTheme).accent,
-    } as React.CSSProperties
+  const customColors = branch?.primaryColor ? {
+    '--primary': branch.primaryColor,
+    '--accent': branch.accentColor || '43 74% 66%',
+    '--background': branch.backgroundColor || '0 0% 100%',
+  } : colorTheme ? {
+    '--primary': getThemeColors(colorTheme).primary,
+    '--secondary': getThemeColors(colorTheme).secondary,
+    '--accent': getThemeColors(colorTheme).accent,
   } : {};
+  
+  const themeStyles = {
+    style: customColors as React.CSSProperties
+  };
 
   return (
     <div className="min-h-screen bg-background" {...themeStyles}>
@@ -187,24 +193,37 @@ const GuestLanding = () => {
 
       {/* Hero Section */}
       <div 
-        className="relative h-[400px] bg-gradient-subtle flex items-center justify-center"
-        style={branch.bannerUrl ? { backgroundImage: `url(${branch.bannerUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+        className="relative min-h-[500px] bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center overflow-hidden"
       >
-        <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" />
-        <div className="relative z-10 text-center px-4 max-w-3xl mx-auto">
-          {branch.logoUrl && (
-            <img 
-              src={branch.logoUrl} 
-              alt={branch.brandName}
-              className="h-20 w-auto mx-auto mb-4"
+        {branch.bannerUrl && (
+          <>
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${branch.bannerUrl})` }}
             />
+            <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/70 to-background/90 backdrop-blur-[2px]" />
+          </>
+        )}
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto py-16">
+          {branch.logoUrl && (
+            <div className="mb-8">
+              <img 
+                src={branch.logoUrl} 
+                alt={branch.brandName}
+                className="h-28 w-28 object-contain mx-auto rounded-2xl shadow-elegant bg-card/80 p-4 backdrop-blur-sm"
+              />
+            </div>
           )}
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{branch.brandName}</h1>
+          <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            {branch.brandName}
+          </h1>
           {tableNumber && (
-            <Badge className="mb-2 text-lg px-4 py-1">Table {tableNumber}</Badge>
+            <Badge className="mb-4 text-lg px-6 py-2 shadow-soft">Table {tableNumber}</Badge>
           )}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-2">{branch.tagline}</p>
-          <p className="text-lg text-muted-foreground">{branch.description}</p>
+          {branch.tagline && (
+            <p className="text-2xl md:text-3xl font-medium mb-4 text-foreground/90">{branch.tagline}</p>
+          )}
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">{branch.description}</p>
         </div>
       </div>
 

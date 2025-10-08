@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { TableManagementReadOnly } from '@/components/owner/TableManagementReadOnly';
+import { TableManagementReadOnlyByFloor } from '@/components/owner/TableManagementReadOnlyByFloor';
 import { useEffect, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 
 const OwnerTablesPage = () => {
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const [userBranches, setUserBranches] = useState<any[]>([]);
+  const [activeBranch, setActiveBranch] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const OwnerTablesPage = () => {
       return;
     }
 
-    setUserBranches(brandBranches);
+    setActiveBranch(brandBranches[0]);
     setLoading(false);
   }, [user, navigate]);
 
@@ -54,7 +54,11 @@ const OwnerTablesPage = () => {
     );
   }
 
-  return <TableManagementReadOnly branches={userBranches} />;
+  if (!activeBranch) {
+    return null;
+  }
+
+  return <TableManagementReadOnlyByFloor branchId={activeBranch.id} />;
 };
 
 export default OwnerTablesPage;

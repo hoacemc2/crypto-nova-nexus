@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
-import { StaffManagement } from '@/components/owner/StaffManagement';
+import { OwnerStaffManagement } from '@/components/owner/OwnerStaffManagement';
 import { useEffect, useState } from 'react';
 import { toast } from '@/hooks/use-toast';
 
@@ -58,7 +58,7 @@ const OwnerStaffPage = () => {
     return null;
   }
 
-  return <StaffManagement branchId={activeBranch.id} />;
+  return <OwnerStaffManagement branchId={activeBranch.id} />;
 };
 
 export default OwnerStaffPage;

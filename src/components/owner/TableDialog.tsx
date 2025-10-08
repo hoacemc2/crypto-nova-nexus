@@ -19,6 +19,7 @@ import { useEffect } from 'react';
 const tableSchema = z.object({
   number: z.coerce.number().min(1, 'Table number must be at least 1'),
   capacity: z.coerce.number().min(1, 'Capacity must be at least 1'),
+  floor: z.coerce.number().min(1, 'Floor must be at least 1'),
   status: z.enum(['available', 'occupied', 'reserved']),
 });
 
@@ -56,12 +57,14 @@ export const TableDialog = ({ open, onOpenChange, branchId, table }: TableDialog
       reset({
         number: table.number,
         capacity: table.capacity,
+        floor: table.floor || 1,
         status: table.status,
       });
     } else {
       reset({
         number: 1,
         capacity: 4,
+        floor: 1,
         status: 'available',
       });
     }
@@ -78,6 +81,7 @@ export const TableDialog = ({ open, onOpenChange, branchId, table }: TableDialog
       addTable({
         number: data.number,
         capacity: data.capacity,
+        floor: data.floor,
         status: data.status,
         branchId,
       });
@@ -113,6 +117,14 @@ export const TableDialog = ({ open, onOpenChange, branchId, table }: TableDialog
             <Input {...register('capacity')} id="capacity" type="number" min="1" />
             {errors.capacity && (
               <p className="text-sm text-destructive">{errors.capacity.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="floor">Floor *</Label>
+            <Input {...register('floor')} id="floor" type="number" min="1" />
+            {errors.floor && (
+              <p className="text-sm text-destructive">{errors.floor.message}</p>
             )}
           </div>
 

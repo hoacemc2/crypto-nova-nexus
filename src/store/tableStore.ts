@@ -7,6 +7,7 @@ export interface Table {
   branchId: string;
   number: number;
   capacity: number;
+  floor: number;
   status: TableStatus;
   qrCode: string;
   createdAt: string;
@@ -22,6 +23,7 @@ interface TableState {
   updateTableStatus: (id: string, status: TableStatus) => void;
   deleteTable: (id: string) => void;
   getTablesByBranch: (branchId: string) => Table[];
+  getTablesByBranchAndFloor: (branchId: string) => Map<number, Table[]>;
   getTableById: (id: string) => Table | undefined;
 }
 
@@ -79,6 +81,21 @@ export const useTableStore = create<TableState>((set, get) => ({
 
   getTablesByBranch: (branchId) => {
     return get().tables.filter((table) => table.branchId === branchId);
+  },
+
+  getTablesByBranchAndFloor: (branchId) => {
+    const tables = get().tables.filter((table) => table.branchId === branchId);
+    const floorMap = new Map<number, Table[]>();
+    
+    tables.forEach((table) => {
+      const floor = table.floor || 1;
+      if (!floorMap.has(floor)) {
+        floorMap.set(floor, []);
+      }
+      floorMap.get(floor)!.push(table);
+    });
+    
+    return floorMap;
   },
 
   getTableById: (id) => {
