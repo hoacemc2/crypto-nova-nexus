@@ -98,7 +98,7 @@ export const BranchLandingCustomizer = ({ branch }: BranchLandingCustomizerProps
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => window.open(`/g/${branch.shortCode}`, '_blank')}
+                onClick={() => window.open(`/branch/${branch.shortCode}`, '_blank')}
               >
                 <Eye className="mr-2 h-4 w-4" />
                 Preview
