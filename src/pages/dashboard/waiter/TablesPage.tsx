@@ -72,9 +72,16 @@ const TablesPage = () => {
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <CardTitle className="text-lg">Table {table.number}</CardTitle>
-                        <Badge variant={getStatusColor(table.status)}>
-                          {table.status}
-                        </Badge>
+                        <div className="flex flex-col gap-2 items-end">
+                          <Badge variant={getStatusColor(table.status)}>
+                            {table.status}
+                          </Badge>
+                          {table.reservationStart && (
+                            <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100">
+                              Reserved
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -83,22 +90,27 @@ const TablesPage = () => {
                         <span>Capacity: {table.capacity} guests</span>
                       </div>
                       
-                      {table.status === 'occupied' && (
+                      {table.reservationName && table.reservationStart && (
                         <div className="space-y-2 p-3 bg-muted rounded-lg">
-                          <div className="flex items-center gap-2 text-sm">
+                          <div className="text-sm font-semibold flex items-center gap-2">
                             <Clock className="h-4 w-4" />
-                            <span>Currently occupied</span>
+                            Reservation Details
+                          </div>
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            <p>Guest: {table.reservationName}</p>
+                            <p>From: {new Date(table.reservationStart).toLocaleString()}</p>
+                            {table.reservationEnd && (
+                              <p>To: {new Date(table.reservationEnd).toLocaleString()}</p>
+                            )}
                           </div>
                         </div>
                       )}
 
-                      {table.reservationName && table.reservationStart && (
+                      {table.status === 'occupied' && !table.reservationStart && (
                         <div className="space-y-2 p-3 bg-muted rounded-lg">
-                          <div className="text-sm font-semibold">
-                            Reservation: {table.reservationName}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            {new Date(table.reservationStart).toLocaleString()}
+                          <div className="flex items-center gap-2 text-sm">
+                            <Clock className="h-4 w-4" />
+                            <span>Currently occupied</span>
                           </div>
                         </div>
                       )}

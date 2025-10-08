@@ -54,8 +54,45 @@ export const TableDetailsDialog = ({ tableId, branchId, open, onOpenChange }: Ta
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Table {table.number} - Details</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              Table {table.number} - Details
+              {table.reservationStart && (
+                <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100">
+                  Reserved
+                </Badge>
+              )}
+            </DialogTitle>
           </DialogHeader>
+
+          {table.reservationStart && (
+            <Card className="bg-muted/50">
+              <CardContent className="pt-6">
+                <h4 className="font-semibold mb-3 text-sm">Reservation Details</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  {table.reservationName && (
+                    <div>
+                      <p className="text-muted-foreground">Guest Name</p>
+                      <p className="font-semibold">{table.reservationName}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-muted-foreground">Start Time</p>
+                    <p className="font-semibold">{new Date(table.reservationStart).toLocaleString()}</p>
+                  </div>
+                  {table.reservationEnd && (
+                    <div>
+                      <p className="text-muted-foreground">End Time</p>
+                      <p className="font-semibold">{new Date(table.reservationEnd).toLocaleString()}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-muted-foreground">Table Capacity</p>
+                    <p className="font-semibold">{table.capacity} guests</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Tabs defaultValue="current" className="w-full">
             <TabsList className="grid w-full grid-cols-2">

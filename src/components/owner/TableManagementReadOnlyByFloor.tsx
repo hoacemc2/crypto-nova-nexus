@@ -61,13 +61,25 @@ export const TableManagementReadOnlyByFloor = ({ branchId }: TableManagementRead
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
                               <span className="font-semibold text-sm">T{table.number}</span>
-                              <Badge variant={getStatusColor(table.status)} className="text-xs">
-                                {table.status}
-                              </Badge>
+                              <div className="flex flex-col gap-1 items-end">
+                                <Badge variant={getStatusColor(table.status)} className="text-xs">
+                                  {table.status}
+                                </Badge>
+                                {table.reservationStart && (
+                                  <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100">
+                                    Reserved
+                                  </Badge>
+                                )}
+                              </div>
                             </div>
                             <p className="text-xs text-muted-foreground">
                               {table.capacity} {table.capacity === 1 ? 'seat' : 'seats'}
                             </p>
+                            {table.reservationName && (
+                              <p className="text-xs text-muted-foreground truncate">
+                                {table.reservationName}
+                              </p>
+                            )}
                           </div>
                         </CardContent>
                       </Card>

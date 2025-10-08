@@ -164,19 +164,31 @@ export const ManagerTableManagement = ({ branchId }: ManagerTableManagementProps
                                       Capacity: {table.capacity} guests
                                     </p>
                                   </div>
-                                  <Badge className={getStatusColor(table.status)}>
-                                    {getStatusLabel(table.status)}
-                                  </Badge>
+                                  <div className="flex flex-col gap-2 items-end">
+                                    <Badge className={getStatusColor(table.status)}>
+                                      {getStatusLabel(table.status)}
+                                    </Badge>
+                                    {table.reservationStart && (
+                                      <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100">
+                                        Reserved
+                                      </Badge>
+                                    )}
+                                  </div>
                                 </div>
 
-                                {table.reservationStart && table.status === 'occupied' && (
-                                  <div className="text-xs bg-muted/50 p-2 rounded">
-                                    <p className="font-medium">Reservation Details</p>
-                                    <p className="text-muted-foreground">
-                                      {new Date(table.reservationStart).toLocaleString()}
-                                    </p>
+                                {table.reservationStart && (
+                                  <div className="text-xs bg-muted/50 p-3 rounded space-y-1">
+                                    <p className="font-medium text-sm">Reservation Details</p>
                                     {table.reservationName && (
                                       <p className="text-muted-foreground">Guest: {table.reservationName}</p>
+                                    )}
+                                    <p className="text-muted-foreground">
+                                      From: {new Date(table.reservationStart).toLocaleString()}
+                                    </p>
+                                    {table.reservationEnd && (
+                                      <p className="text-muted-foreground">
+                                        To: {new Date(table.reservationEnd).toLocaleString()}
+                                      </p>
                                     )}
                                   </div>
                                 )}
@@ -256,25 +268,36 @@ export const ManagerTableManagement = ({ branchId }: ManagerTableManagementProps
               </div>
 
               {selectedTable.reservationStart && (
-                <>
-                  <div className="border-t pt-4">
-                    <h4 className="font-semibold mb-2">Reservation Information</h4>
-                    <div className="space-y-2">
-                      {selectedTable.reservationName && (
-                        <div>
-                          <p className="text-sm text-muted-foreground">Guest Name</p>
-                          <p className="font-semibold">{selectedTable.reservationName}</p>
-                        </div>
-                      )}
+                <div className="border-t pt-4">
+                  <h4 className="font-semibold mb-3 flex items-center gap-2">
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100">
+                      Reserved
+                    </Badge>
+                    Reservation Information
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {selectedTable.reservationName && (
                       <div>
-                        <p className="text-sm text-muted-foreground">Time</p>
+                        <p className="text-sm text-muted-foreground">Guest Name</p>
+                        <p className="font-semibold">{selectedTable.reservationName}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-sm text-muted-foreground">Start Time</p>
+                      <p className="font-semibold">
+                        {new Date(selectedTable.reservationStart).toLocaleString()}
+                      </p>
+                    </div>
+                    {selectedTable.reservationEnd && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">End Time</p>
                         <p className="font-semibold">
-                          {new Date(selectedTable.reservationStart).toLocaleString()}
+                          {new Date(selectedTable.reservationEnd).toLocaleString()}
                         </p>
                       </div>
-                    </div>
+                    )}
                   </div>
-                </>
+                </div>
               )}
             </div>
           )}

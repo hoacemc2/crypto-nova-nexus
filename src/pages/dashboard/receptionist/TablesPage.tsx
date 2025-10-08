@@ -99,9 +99,16 @@ const TablesPage = () => {
                           {getStatusIcon(table.status)}
                           <CardTitle className="text-lg">Table {table.number}</CardTitle>
                         </div>
-                        <Badge variant={getStatusColor(table.status)}>
-                          {table.status}
-                        </Badge>
+                        <div className="flex flex-col gap-2 items-end">
+                          <Badge variant={getStatusColor(table.status)}>
+                            {table.status}
+                          </Badge>
+                          {table.reservationStart && (
+                            <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100">
+                              Reserved
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -112,16 +119,21 @@ const TablesPage = () => {
 
                       {table.reservationName && table.reservationStart && (
                         <div className="p-3 bg-muted rounded-lg space-y-1">
-                          <div className="text-sm font-semibold">
-                            Reservation: {table.reservationName}
+                          <div className="text-sm font-semibold flex items-center gap-2">
+                            <Clock className="h-4 w-4" />
+                            Reservation Details
                           </div>
-                          <div className="text-xs text-muted-foreground">
-                            {new Date(table.reservationStart).toLocaleString()}
+                          <div className="text-xs text-muted-foreground space-y-1">
+                            <p>Guest: {table.reservationName}</p>
+                            <p>From: {new Date(table.reservationStart).toLocaleString()}</p>
+                            {table.reservationEnd && (
+                              <p>To: {new Date(table.reservationEnd).toLocaleString()}</p>
+                            )}
                           </div>
                         </div>
                       )}
 
-                      {table.status === 'occupied' && (
+                      {table.status === 'occupied' && !table.reservationStart && (
                         <div className="p-3 bg-muted rounded-lg space-y-1">
                           <div className="text-sm font-semibold">
                             Currently occupied

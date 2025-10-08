@@ -145,19 +145,31 @@ export const TableStatusView = ({ branchId }: TableStatusViewProps) => {
                                     Capacity: {table.capacity} guests
                                   </p>
                                 </div>
-                                <Badge variant={getStatusVariant(table.status)}>
-                                  {table.status}
-                                </Badge>
+                                <div className="flex flex-col gap-2 items-end">
+                                  <Badge variant={getStatusVariant(table.status)}>
+                                    {table.status}
+                                  </Badge>
+                                  {table.reservationStart && (
+                                    <Badge variant="secondary" className="bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-100">
+                                      Reserved
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
 
                               {table.reservationStart && (
-                                <div className="text-xs bg-muted/50 p-2 rounded">
-                                  <p className="font-medium">Reserved</p>
-                                  <p className="text-muted-foreground">
-                                    {new Date(table.reservationStart).toLocaleString()}
-                                  </p>
+                                <div className="text-xs bg-muted/50 p-3 rounded space-y-1">
+                                  <p className="font-medium text-sm">Reservation Details</p>
                                   {table.reservationName && (
-                                    <p className="text-muted-foreground">For: {table.reservationName}</p>
+                                    <p className="text-muted-foreground">Guest: {table.reservationName}</p>
+                                  )}
+                                  <p className="text-muted-foreground">
+                                    From: {new Date(table.reservationStart).toLocaleString()}
+                                  </p>
+                                  {table.reservationEnd && (
+                                    <p className="text-muted-foreground">
+                                      To: {new Date(table.reservationEnd).toLocaleString()}
+                                    </p>
                                   )}
                                 </div>
                               )}
