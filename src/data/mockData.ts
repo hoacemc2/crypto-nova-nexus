@@ -149,21 +149,129 @@ export const mockMenuItems = [
   },
 ];
 
-// Tables with branchId linking
+// Tables with branchId linking - with reservation data
 export const mockTables = [
   // Downtown Branch tables
-  { id: '1', branchId: '1', number: 1, capacity: 2, status: 'available', qrCode: 'QR001' },
-  { id: '2', branchId: '1', number: 2, capacity: 4, status: 'occupied', qrCode: 'QR002' },
-  { id: '3', branchId: '1', number: 3, capacity: 4, status: 'available', qrCode: 'QR003' },
-  { id: '4', branchId: '1', number: 4, capacity: 6, status: 'reserved', qrCode: 'QR004' },
-  { id: '5', branchId: '1', number: 5, capacity: 2, status: 'available', qrCode: 'QR005' },
-  { id: '6', branchId: '1', number: 6, capacity: 8, status: 'occupied', qrCode: 'QR006' },
+  { 
+    id: '1', 
+    branchId: '1', 
+    number: 1, 
+    capacity: 2, 
+    floor: 1,
+    status: 'available', 
+    qrCode: 'QR001',
+    createdAt: new Date().toISOString()
+  },
+  { 
+    id: '2', 
+    branchId: '1', 
+    number: 2, 
+    capacity: 4, 
+    floor: 1,
+    status: 'occupied', 
+    qrCode: 'QR002',
+    reservationStart: new Date(Date.now() + 3600000).toISOString(),
+    reservationEnd: new Date(Date.now() + 7200000).toISOString(),
+    reservationName: 'John Smith',
+    createdAt: new Date().toISOString()
+  },
+  { 
+    id: '3', 
+    branchId: '1', 
+    number: 3, 
+    capacity: 4, 
+    floor: 1,
+    status: 'available', 
+    qrCode: 'QR003',
+    createdAt: new Date().toISOString()
+  },
+  { 
+    id: '4', 
+    branchId: '1', 
+    number: 4, 
+    capacity: 6, 
+    floor: 2,
+    status: 'available', 
+    qrCode: 'QR004',
+    createdAt: new Date().toISOString()
+  },
+  { 
+    id: '5', 
+    branchId: '1', 
+    number: 5, 
+    capacity: 2, 
+    floor: 2,
+    status: 'available', 
+    qrCode: 'QR005',
+    createdAt: new Date().toISOString()
+  },
+  { 
+    id: '6', 
+    branchId: '1', 
+    number: 6, 
+    capacity: 8, 
+    floor: 2,
+    status: 'occupied', 
+    qrCode: 'QR006',
+    reservationStart: new Date(Date.now() - 1800000).toISOString(),
+    reservationEnd: new Date(Date.now() + 5400000).toISOString(),
+    reservationName: 'Sarah Johnson',
+    createdAt: new Date().toISOString()
+  },
   // Westside Branch tables
-  { id: '11', branchId: '2', number: 1, capacity: 4, status: 'available', qrCode: 'QR011' },
-  { id: '12', branchId: '2', number: 2, capacity: 4, status: 'available', qrCode: 'QR012' },
-  { id: '13', branchId: '2', number: 3, capacity: 6, status: 'occupied', qrCode: 'QR013' },
-  { id: '14', branchId: '2', number: 4, capacity: 2, status: 'available', qrCode: 'QR014' },
-  { id: '15', branchId: '2', number: 5, capacity: 8, status: 'available', qrCode: 'QR015' },
+  { 
+    id: '11', 
+    branchId: '2', 
+    number: 1, 
+    capacity: 4, 
+    floor: 1,
+    status: 'available', 
+    qrCode: 'QR011',
+    createdAt: new Date().toISOString()
+  },
+  { 
+    id: '12', 
+    branchId: '2', 
+    number: 2, 
+    capacity: 4, 
+    floor: 1,
+    status: 'available', 
+    qrCode: 'QR012',
+    createdAt: new Date().toISOString()
+  },
+  { 
+    id: '13', 
+    branchId: '2', 
+    number: 3, 
+    capacity: 6, 
+    floor: 1,
+    status: 'occupied', 
+    qrCode: 'QR013',
+    reservationStart: new Date(Date.now() + 1800000).toISOString(),
+    reservationEnd: new Date(Date.now() + 9000000).toISOString(),
+    reservationName: 'David Brown',
+    createdAt: new Date().toISOString()
+  },
+  { 
+    id: '14', 
+    branchId: '2', 
+    number: 4, 
+    capacity: 2, 
+    floor: 2,
+    status: 'available', 
+    qrCode: 'QR014',
+    createdAt: new Date().toISOString()
+  },
+  { 
+    id: '15', 
+    branchId: '2', 
+    number: 5, 
+    capacity: 8, 
+    floor: 2,
+    status: 'available', 
+    qrCode: 'QR015',
+    createdAt: new Date().toISOString()
+  },
 ];
 
 // Orders with branchId linking

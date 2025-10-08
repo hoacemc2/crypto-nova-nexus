@@ -69,6 +69,30 @@ export default function StaffPage() {
     setAddStaffDialogOpen(true);
   };
 
+  const handleEditStaff = (staffMember: Staff) => {
+    setEditingStaff(staffMember);
+    setAddStaffDialogOpen(true);
+    setDialogOpen(false);
+  };
+
+  const handleDeleteStaff = (staffId: string) => {
+    if (confirm('Are you sure you want to delete this staff member?')) {
+      const storedStaff = localStorage.getItem('mock_staff');
+      const allStaff: Staff[] = storedStaff ? JSON.parse(storedStaff) : [];
+      const updatedStaff = allStaff.filter(s => s.id !== staffId);
+      localStorage.setItem('mock_staff', JSON.stringify(updatedStaff));
+      
+      // Also update staff_members store
+      const staffMembers = localStorage.getItem('staff_members');
+      const allMembers = staffMembers ? JSON.parse(staffMembers) : [];
+      const updatedMembers = allMembers.filter((s: any) => s.id !== staffId);
+      localStorage.setItem('staff_members', JSON.stringify(updatedMembers));
+      
+      loadStaff();
+      setDialogOpen(false);
+    }
+  };
+
   const handleStaffSaved = () => {
     loadStaff();
     setAddStaffDialogOpen(false);
@@ -197,6 +221,8 @@ export default function StaffPage() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         staff={selectedStaff}
+        onEdit={handleEditStaff}
+        onDelete={handleDeleteStaff}
       />
 
       <StaffManagementDialog

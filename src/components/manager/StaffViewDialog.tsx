@@ -2,7 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Mail, Phone, MapPin, Calendar } from 'lucide-react';
+import { Mail, Phone, MapPin, Calendar, Pencil, Trash2 } from 'lucide-react';
 
 interface Staff {
   id: string;
@@ -20,12 +20,16 @@ interface StaffViewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   staff: Staff[];
+  onEdit?: (staff: Staff) => void;
+  onDelete?: (staffId: string) => void;
 }
 
 export const StaffViewDialog = ({ 
   open, 
   onOpenChange, 
-  staff 
+  staff,
+  onEdit,
+  onDelete
 }: StaffViewDialogProps) => {
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
@@ -83,6 +87,26 @@ export const StaffViewDialog = ({
                               {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
                             </Badge>
                           </div>
+                        </div>
+                        <div className="flex gap-2">
+                          {onEdit && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onEdit(member)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {onDelete && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => onDelete(member.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
                         </div>
                       </div>
 

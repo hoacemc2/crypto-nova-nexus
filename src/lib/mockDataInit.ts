@@ -81,6 +81,17 @@ export const initializeMockData = () => {
   if (!localStorage.getItem('mock_users')) {
     localStorage.setItem('mock_users', JSON.stringify(mockUsers));
   }
+  
+  // Initialize new store systems with mock data
+  if (!localStorage.getItem('tables')) {
+    localStorage.setItem('tables', JSON.stringify(mockTables));
+  }
+  if (!localStorage.getItem('menu_items')) {
+    localStorage.setItem('menu_items', JSON.stringify(mockMenuItems));
+  }
+  if (!localStorage.getItem('staff_members')) {
+    localStorage.setItem('staff_members', JSON.stringify(mockStaff));
+  }
 };
 
 // Get data for a specific branch

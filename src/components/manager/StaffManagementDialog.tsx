@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,10 +27,34 @@ export const StaffManagementDialog = ({ open, onOpenChange, staff, branchId, onS
 
   const { addStaff } = useStaffStore();
 
+  // Populate form when editing
+  useEffect(() => {
+    if (staff && open) {
+      setFormData({
+        name: staff.name || '',
+        email: staff.email || '',
+        phone: staff.phone || '',
+        role: staff.role || 'waiter',
+        username: staff.username || '',
+        password: staff.password || '',
+      });
+    } else if (!open) {
+      // Reset form when closing
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        role: 'waiter',
+        username: '',
+        password: '',
+      });
+    }
+  }, [staff, open]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.username || !formData.password) {
+    if (!formData.name || !formData.email || !formData.username) {
       toast({
         variant: 'destructive',
         title: 'Missing fields',
@@ -39,21 +63,65 @@ export const StaffManagementDialog = ({ open, onOpenChange, staff, branchId, onS
       return;
     }
 
-    addStaff({
-      branchId,
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      role: formData.role,
-      username: formData.username,
-      password: formData.password,
-      status: 'active',
-    });
+    if (staff) {
+      // Update existing staff
+      const storedStaff = localStorage.getItem('mock_staff');
+      const allStaff = storedStaff ? JSON.parse(storedStaff) : [];
+      const updatedStaff = allStaff.map((s: any) =>
+        s.id === staff.id
+          ? {
+              ...s,
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+              role: formData.role,
+              username: formData.username,
+              password: formData.password || s.password,
+            }
+          : s
+      );
+      localStorage.setItem('mock_staff', JSON.stringify(updatedStaff));
 
-    toast({
-      title: 'Staff member added',
-      description: `${formData.name} has been added as ${formData.role}.`,
-    });
+      // Also update staff_members store
+      const staffMembers = localStorage.getItem('staff_members');
+      const allMembers = staffMembers ? JSON.parse(staffMembers) : [];
+      const updatedMembers = allMembers.map((s: any) =>
+        s.id === staff.id
+          ? {
+              ...s,
+              name: formData.name,
+              email: formData.email,
+              phone: formData.phone,
+              role: formData.role,
+              username: formData.username,
+              password: formData.password || s.password,
+            }
+          : s
+      );
+      localStorage.setItem('staff_members', JSON.stringify(updatedMembers));
+
+      toast({
+        title: 'Staff member updated',
+        description: `${formData.name}'s information has been updated.`,
+      });
+    } else {
+      // Add new staff
+      addStaff({
+        branchId,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        role: formData.role,
+        username: formData.username,
+        password: formData.password,
+        status: 'active',
+      });
+
+      toast({
+        title: 'Staff member added',
+        description: `${formData.name} has been added as ${formData.role}.`,
+      });
+    }
 
     setFormData({
       name: '',
@@ -72,9 +140,9 @@ export const StaffManagementDialog = ({ open, onOpenChange, staff, branchId, onS
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Add New Staff Member</DialogTitle>
+          <DialogTitle>{staff ? 'Edit Staff Member' : 'Add New Staff Member'}</DialogTitle>
           <DialogDescription>
-            Add a waiter or receptionist to your branch team.
+            {staff ? 'Update staff member information.' : 'Add a waiter or receptionist to your branch team.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -137,13 +205,13 @@ export const StaffManagementDialog = ({ open, onOpenChange, staff, branchId, onS
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password *</Label>
+            <Label htmlFor="password">Password {!staff && '*'}</Label>
             <Input
               id="password"
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              placeholder="••••••••"
+              placeholder={staff ? 'Leave blank to keep current' : '••••••••'}
             />
           </div>
 
@@ -151,7 +219,7 @@ export const StaffManagementDialog = ({ open, onOpenChange, staff, branchId, onS
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Add Staff Member</Button>
+            <Button type="submit">{staff ? 'Update Staff Member' : 'Add Staff Member'}</Button>
           </div>
         </form>
       </DialogContent>
